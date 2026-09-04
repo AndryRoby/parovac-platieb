@@ -1,0 +1,12 @@
+{
+  "name": "parovac-platieb",
+  "version": "1.0.0",
+  "description": "Párovač platieb: výpis z banky proti faktúram. Free, client-side tool that matches a camt.053 bank statement (Tatra banka, SLSP, VÚB, ČSOB) against a list of issued invoices (Pohoda, Omega, Money S3, SuperFaktúra, iDoklad, Fakturoid, or a plain spreadsheet).",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests.mjs"
+  },
+  "license": "UNLICENSED",
+  "author": "ARLing s. r. o. <andrej@arling.sk>"
+}
