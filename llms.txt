@@ -1,0 +1,40 @@
+# Párovač platieb: výpis z banky proti faktúram
+
+> Free, client-side tool that matches a bank statement (camt.053 XML from Tatra banka, SLSP, VÚB, or ČSOB) against a list of issued invoices (exported from Pohoda, Omega, Money S3, SuperFaktúra, iDoklad, Fakturoid, or a plain spreadsheet), so an accountant doesn't have to check paid/unpaid status by hand.
+
+Paste or upload the invoice list, load a camt.053 statement (or its CSV export), and get back four lists: matched, partial/overpaid, proposed matches (no variable symbol), and unmatched. No account, no backend, nothing you paste leaves your browser except an optional email if you join the mailing list.
+
+## What it does
+
+- Parses a `camt.053.001.02` / `camt.053.001.08` bank statement via the same client-side parser as the sibling tool camt.053-to-excel (`camt053.js`, `window.CamtConverter.parse`/`.toRows`), or accepts that tool's CSV export directly.
+- Parses a pasted TSV/CSV block or an uploaded `.csv`/`.txt`/`.tsv` invoice list, auto-detecting columns by header name (invoice number, variabilný symbol/VS, amount/suma/celkom/k úhrade, splatnosť, odberateľ/firma, mena, uhradené), with manual dropdowns to fix any column the auto-detection gets wrong.
+- Ships heuristic column-header templates for exports from Pohoda, Omega, Money S3, SuperFaktúra, iDoklad, and Fakturoid, labeled honestly as heuristics rather than vendor-verified specs.
+- Matches each invoice against statement payments in order: (1) VS matches and amount matches within a configurable cent tolerance (default 0.01 EUR) → matched; (2) VS matches, amount differs → partial payment or overpayment; (3) no VS, but amount matches and the payment date is within 45 days of the due date and the match is unique → proposed match, flagged as a proposal, not auto-confirmed; (4) everything else → unmatched.
+- Sums multiple payments against the same invoice (installments) before matching, so an invoice paid in several installments is correctly evaluated as paid.
+- Runs entirely in the browser via one dependency-free engine script, `parovac.js` (ES module and `window.Parovac = {parseInvoices, mapColumns, match, report, toCsv}`), which works unchanged in Node.js and in the browser.
+
+## Who it's for
+
+A Slovak accountant or company that reconciles received payments against issued invoices every month (or more often) and does it by hand today: comparing a bank statement line by line against a spreadsheet of invoices by variable symbol and amount, a process prone to typos in the VS, wrong amounts, and payments landing in a different month than the due date.
+
+## Pro (9 EUR/month or 79 EUR/year, optional)
+
+Core matching (one statement against one invoice list, any supported format, no row limit) stays free with no cap. Pro adds: multiple statements and accounts at once, saved column-mapping presets, configurable tolerances (days for a no-VS proposal, cents for an amount match) saved as defaults, export formatted for import into Pohoda/Omega/Money S3, and match history. Purchase goes through Stripe (9 EUR per month or 79 EUR per year) as part of the bundle Bankové nástroje pre účtovníkov (https://arling.sk/bankove-nastroje/). Licence mechanics match the sibling SEPA pain.001 Generátor: a signed licence (Ed25519, plan `sepa-pro`, shared by the whole bundle), verified client-side with WebCrypto, stored in `localStorage`, obtained after payment from `https://homelab.tailbf8f27.ts.net/licence/api/claim?session_id=`.
+
+## Privacy
+
+No account, no login, no cookies for the tool itself, no server-side processing of your statement or invoices. The only analytics are anonymous usage counts (event name + count, never IBANs, VS, names, or amounts) sent to a self-hosted Umami instance.
+
+## Links
+
+- Tool: https://arling.sk/parovac-platieb/
+- Full reference (matching rules, worked example, FAQ): https://arling.sk/parovac-platieb/llms-full.txt
+- Source code: https://github.com/AndryRoby/parovac-platieb
+- Sibling tool (camt.053 statement to Excel): https://arling.sk/camt053-to-excel/
+- Sibling tool (SEPA pain.001 batch payment generator): https://arling.sk/sepa-pain001-generator/
+- Sibling tool (SEPA pain.001 file checker): https://arling.sk/sepa-pain001-doctor/
+- Hub (more ARLing tools): https://arling.sk/
+
+## Contact
+
+Built by ARLing s. r. o. (Bratislava, Slovakia). andrej@arling.sk

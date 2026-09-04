@@ -1,0 +1,122 @@
+# Párovač platieb: výpis z banky proti faktúram
+
+> Free, client-side tool that matches a bank statement (camt.053 XML from Tatra banka, SLSP, VÚB, or ČSOB) against a list of issued invoices (exported from Pohoda, Omega, Money S3, SuperFaktúra, iDoklad, Fakturoid, or a plain spreadsheet), producing four lists (matched, partial/overpaid, proposed, unmatched) without uploading either the statement or the invoices anywhere.
+
+## Why this exists
+
+Built-in payment matching inside Pohoda, iDoklad, Fakturoid, and similar accounting software matches by variable symbol and, when the VS is missing, wrong, or a payment covers several invoices at once, drops the payment into a manual queue for someone to sort out by hand. A bookkeeper or company director without that software (or with a payment list that never made it into it, e.g. a spreadsheet of invoices kept alongside the accounting program) has no equivalent: they compare a bank statement against a spreadsheet of invoices line by line, a process that's slow at any real invoice count and error-prone whenever a client mistypes the VS, pays a slightly wrong amount, or pays weeks after the due date in a different statement period than expected.
+
+## Input: payments
+
+- A `camt.053.001.02` or `camt.053.001.08` XML bank statement, the default "export to accounting" format from all four major Slovak banks (Tatra banka, SLSP, VÚB, ČSOB), parsed via the same client-side engine as the sibling tool camt.053-to-excel: `camt053.js`, `window.CamtConverter.parse` / `.toRows`. This file is copied in unchanged from that sibling tool, not reimplemented.
+- Or a CSV export already produced by that sibling tool, if the statement has already been converted to a table.
+
+## Input: invoices
+
+Pasted TSV/CSV text (cells copied straight out of Excel) or an uploaded `.csv`/`.txt`/`.tsv` file, read client-side with the browser's own `FileReader` API.
+
+Columns are auto-detected by header name, Slovak or English:
+
+| Field | Recognized header names |
+|---|---|
+| Invoice number | `číslo faktúry`, `faktúra`, `doklad` |
+| Variabilný symbol | `vs`, `variabilný symbol` |
+| Amount | `suma`, `celkom`, `k úhrade`, `amount` |
+| Due date | `splatnosť`, `due date` |
+| Customer | `odberateľ`, `firma`, `zákazník`, `customer` |
+| Currency | `mena`, `currency` |
+| Paid flag | `uhradené`, `zaplatené`, `paid` |
+
+Every column also has a manual dropdown, so a header that doesn't match any of the above (or a wrong auto-detected guess) can be remapped by hand before running the match.
+
+Column-header templates for Pohoda, Omega, Money S3, SuperFaktúra, iDoklad, and Fakturoid are included as a starting guess for the auto-mapping. These are heuristics built from the typical export headers each program produces, not specifications verified against each vendor's documentation, and the tool labels them as such rather than claiming vendor-certified support.
+
+## Matching algorithm
+
+Run once per invoice, in this fixed order:
+
+1. **VS matches, amount matches.** Variable symbol on the payment equals the invoice's VS, and the amount matches within a configurable cent tolerance (default 0.01 EUR). Result: **matched**.
+2. **VS matches, amount differs.** Same VS, amount outside tolerance. Result: **partial payment or overpayment**, with the difference reported.
+3. **No matching VS.** If the amount matches exactly (within tolerance) a single unmatched invoice, and the payment date falls within 45 days of that invoice's due date, and no other invoice is an equally valid candidate (the match is unique, not ambiguous), the pairing is offered as a **proposed match**: shown to the user labeled "návrh" (proposal), not silently auto-confirmed.
+4. **Everything else.** Payments that fit none of the above stay in the unmatched-payments list; invoices with no qualifying payment stay in the unmatched-invoices list.
+
+**Installments.** Before matching, all payments carrying the same VS are summed, so an invoice paid across two or more separate bank transfers is evaluated against its total received amount rather than compared payment-by-payment.
+
+## Output
+
+Four lists, each downloadable as CSV:
+
+1. Matched (VS + amount).
+2. Partial payments / overpayments (VS matched, amount differs).
+3. Proposed matches (no VS, amount + date proximity, flagged as a proposal).
+4. Unmatched (payments with no invoice, invoices with no payment).
+
+## Engine
+
+`parovac.js`: one dependency-free JavaScript file, ES module and, loaded via `<script type="module">`, also published as `window.Parovac = {parseInvoices, mapColumns, match, report, toCsv}`. Identical behavior in Node.js and in the browser, matching the pattern the sibling tools (`generator-pain001.js`, `camt053.js`) already use in this product family.
+
+## How it works
+
+Static HTML plus two dependency-free scripts (`camt053.js`, copied unmodified from the sibling camt.053-to-excel tool, and `parovac.js`, this tool's own matching engine). Parsing the statement, parsing the invoice list, and running the match all happen in your browser. There is no backend and no request that carries the content of your statement or invoices anywhere: read `index.html`, `camt053.js`, and `parovac.js` directly to verify.
+
+## Pro (9 EUR/month or 79 EUR/year, optional)
+
+Core matching (one statement against one invoice list, any supported input format, no cap on the number of rows) is, and stays, entirely free. Pro is aimed at an accountant or company running this every month across more than one account, and adds:
+
+- **Multiple statements and accounts at once**, instead of one statement against one invoice list per session.
+- **Saved column-mapping presets**, so a recurring monthly export from the same accounting program doesn't need remapping each time.
+- **Configurable tolerances saved as a default**: the cent tolerance for an amount match, and the day window (default 45) for a no-VS proposed match, both currently hardcoded free-tier defaults.
+- **Export formatted for import into Pohoda, Omega, or Money S3**, rather than the free tier's generic CSV.
+- **Match history**: previous runs, retrievable without re-uploading.
+
+Purchase goes through Stripe Checkout (9 EUR per month or 79 EUR per year, `BUY_URL` and `BUY_URL_YEAR` in `pro.js`) as part of the bundle Bankové nástroje pre účtovníkov.
+
+Licence mechanics are the same mechanism as the sibling SEPA pain.001 Generátor: after payment, the page requests a signed licence (Ed25519 signature over a small JSON payload carrying the plan and expiry) from `https://homelab.tailbf8f27.ts.net/licence/api/claim?session_id=` and stores it in the browser's `localStorage`. Verification happens entirely client-side via the browser's WebCrypto API against a public key baked into `licence.js` (`xcMFelDwaZ1DC7ObQTKi8zXPvMlrTAlgZySNpfuYbC8`); no server call happens on ordinary use after that. The plan identifier is `sepa-pro`, the shared plan of the bundle Bankové nástroje pre účtovníkov (https://arling.sk/bankove-nastroje/): one licence key unlocks Pro in the SEPA pain.001 Generátor, camt.053 to Excel and this tool. No account or login is involved; the same licence key can be pasted into the page on a different browser or computer to activate Pro there too.
+
+## Who it's for
+
+Slovak accountants and companies that reconcile received payments against issued invoices monthly or more often, whose invoice list may live outside (or alongside) accounting software with its own built-in VS-based matching, and who want the same VS-plus-tolerance-plus-date-proximity logic applied automatically to a `camt.053` statement without uploading either side of the comparison anywhere.
+
+## FAQ
+
+**Does it need my accounting software connected to work?**
+No. It reads a `camt.053` statement (or its CSV export) and an invoice list you paste or upload; neither Pohoda, Omega, Money S3, SuperFaktúra, iDoklad, nor Fakturoid needs to be connected. The listed column-header templates just make the initial mapping faster if your invoice export came from one of them.
+
+**What if my invoice export's column headers don't match any listed template?**
+Nothing breaks: every detected column has a manual dropdown, so you remap invoice number/VS/amount/due date/customer/currency/paid by hand before running the match.
+
+**Why does a match with no variable symbol get labeled "proposed" instead of being confirmed automatically?**
+An amount-and-date match without a VS is inherently less certain than a VS match: two invoices could plausibly share a similar amount and due date. The tool only proposes such a pairing when it is unique (no other invoice is an equally valid candidate) and still leaves it flagged as a proposal for a human to confirm rather than auto-finalizing it.
+
+**Why 45 days as the date window for a no-VS proposal?**
+It's the free-tier default distance between a payment date and an invoice's due date within which an unreferenced payment is still offered as a candidate match, rather than left unmatched outright. Pro lets this window (and the cent tolerance for amount matches) be configured and saved instead of using the fixed default.
+
+**What happens when an invoice is paid in two or more installments?**
+Payments sharing the same VS are summed before matching, so the invoice is evaluated against the total received, and shows as matched once installments add up to the invoice amount within tolerance.
+
+**Is there a row limit on the free tier?**
+No, for either the statement or the invoice list. Pro's limits are about running more than one statement/account at once and saved presets, not a row cap on a single match.
+
+**Does anything get uploaded when I use the file picker instead of pasting?**
+No. Files are read locally via the browser's `FileReader` API, the same way pasted text is parsed, and never leave the page.
+
+**Is `camt053.js` a separate implementation from the sibling camt.053-to-excel tool?**
+No, it's the identical file, copied in unmodified, so any fix or format update to the camt.053 parser lands in both tools from the same source.
+
+## Privacy
+
+No account, no login, no cookies for the tool itself, no server-side processing of your statement or invoices. The only analytics are anonymous usage counts (event name + count, never IBANs, VS, names, or amounts) sent to a self-hosted Umami instance. The only exception is the optional mailing-list form: if you type an email address into it, that address is sent to the subscribe endpoint and nothing else.
+
+## Links
+
+- Tool: https://arling.sk/parovac-platieb/
+- Short reference: https://arling.sk/parovac-platieb/llms.txt
+- Source code: https://github.com/AndryRoby/parovac-platieb
+- Sibling tool (camt.053 statement to Excel): https://arling.sk/camt053-to-excel/
+- Sibling tool (SEPA pain.001 batch payment generator): https://arling.sk/sepa-pain001-generator/
+- Sibling tool (SEPA pain.001 file checker): https://arling.sk/sepa-pain001-doctor/
+- Hub (more ARLing tools): https://arling.sk/
+
+## Contact
+
+Built by ARLing s. r. o. (Bratislava, Slovakia). andrej@arling.sk

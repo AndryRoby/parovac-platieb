@@ -1,0 +1,31 @@
+{
+  "name": "Párovač platieb: výpis z banky proti faktúram",
+  "short_name": "Párovač platieb",
+  "description": "Spáruje výpis z banky (camt.053 z Tatra banky, SLSP, VÚB, ČSOB) so zoznamom vydaných faktúr z Pohody, Omegy, Money S3, SuperFaktúry, iDokladu, Fakturoidu alebo z tabuľky. Zadarmo, priamo v prehliadači, nič sa neodosiela.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "lang": "sk",
+  "background_color": "#f6f2ea",
+  "theme_color": "#f6f2ea",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
