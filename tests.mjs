@@ -22,7 +22,7 @@ import {
   loadToleranceSettings, saveToleranceSettings,
   MARK_PAID_EXPORT_FORMATS, buildMarkPaidExport,
   mergeStatementPayments, loadHistory, addHistoryEntry, clearHistory, HISTORY_MAX,
-  BUY_URL,
+  BUY_URL, BUY_URL_YEAR,
 } from './pro.js';
 
 // Minimal in-memory localStorage polyfill: Node has no Web Storage API by
@@ -411,6 +411,7 @@ eq('licence: STORAGE_KEY is shared across the bundle', LICENCE_STORAGE_KEY, 'arl
 // ═══════════════════════════════ pro.js ═════════════════════════════════════
 
 ok('pro: BUY_URL is the Stripe bundle link', BUY_URL.startsWith('https://buy.stripe.com/'));
+ok('pro: BUY_URL_YEAR is the yearly Stripe bundle link', BUY_URL_YEAR.startsWith('https://buy.stripe.com/') && BUY_URL_YEAR !== BUY_URL);
 
 {
   clearHistory();
