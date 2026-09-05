@@ -292,14 +292,16 @@
   .subscribe-privacy { flex-basis:100%; margin:0; }
   @media (max-width:480px) { .subscribe-form input[type="email"], .subscribe-form button { width:100%; } }
 
-  .pro-purchase { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:28px; align-items:start; }
-  @media (max-width:820px) { .pro-purchase { grid-template-columns:minmax(0,1fr); } }
+  .pro-purchase { display:flex; flex-wrap:wrap; gap:24px; margin-top:28px; align-items:stretch; }
+  .pro-cta { border:1px solid var(--line); background:var(--paper-2); padding:24px; flex:1 1 280px; min-width:0; }
+  .pro-cta p { margin:0 0 16px; color:var(--ink-2); font-size:15px; }
+  .pro-cta .btn { display:inline-block; }
   .pro-price-cards { display:flex; flex-direction:column; gap:14px; }
   .pro-price { border:1px solid var(--line); background:var(--paper-2); padding:22px; }
   .pro-price-amount { font:400 30px/1 var(--serif); margin:0 0 14px; }
   .pro-price-amount span { font:13px/1 var(--sans); color:var(--muted); }
   .pro-price .btn { display:block; text-align:center; margin:0; }
-  .pro-licence-box { border:1px solid var(--line); background:var(--paper); padding:20px 22px; display:flex; flex-direction:column; gap:16px; min-width:0; }
+  .pro-licence-box { border:1px solid var(--line); background:var(--paper); padding:20px 22px; display:flex; flex-direction:column; gap:16px; min-width:0; flex:1 1 320px; }
   .status-pill { display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:4px; border:1px solid var(--line); background:var(--paper); color:var(--ink-2); font:11.5px/1 var(--mono); }
   .status-pill.fail { color:var(--accent); border-color:var(--accent); background:var(--accent-soft); }
   .status-pill.pass { color:var(--ok); border-color:var(--ok); }
@@ -335,6 +337,16 @@
     .wordmark-sub { display:none; }
     .btn + .btn { margin-left:0; margin-top:10px; }
   }
+
+  /* Sticky mobile Pro bar (Paper Sell): mobile only, appears after the hero, closable. */
+  .sticky-cta { position:fixed; left:0; right:0; bottom:0; z-index:30; background:var(--paper-2); border-top:1px solid var(--line); }
+  .sticky-cta-inner { display:flex; align-items:center; gap:10px; max-width:1040px; margin:0 auto; padding:10px 14px; }
+  .sticky-cta-text { flex:1 1 auto; min-width:0; font-size:12.5px; color:var(--ink-2); overflow-wrap:anywhere; }
+  .sticky-cta .btn { flex:none; padding:10px 14px; font-size:13.5px; margin:0; }
+  .sticky-cta-close { flex:none; width:30px; height:30px; border:1px solid var(--line); background:var(--paper); color:var(--ink-2); border-radius:4px; cursor:pointer; font:16px/1 var(--sans); padding:0; }
+  .sticky-cta-close:hover { border-color:var(--accent); color:var(--accent); }
+  @media (min-width:761px) { .sticky-cta { display:none !important; } }
+  @media print { .sticky-cta { display:none !important; } }
 </style>
 </head>
 <body>
@@ -568,30 +580,15 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
           <p>Mapovanie stĺpcov pre pravidelný mesačný export z vášho účtovného programu sa uloží a nabudúce sa už len vyberie.</p>
         </li>
         <li>
-          <b>Nastaviteľné tolerancie.</b>
-          <p>Tolerancia sumy pri zhode a počet dní pri návrhu bez VS sa dajú upraviť a uložia sa ako predvoľba namiesto pevných 0,01 € a 45 dní.</p>
-        </li>
-        <li>
           <b>Export pre Pohodu, Omegu alebo Money S3.</b>
           <p>Zoznam spárovaných faktúr na označenie ako uhradené vo formáte pripravenom pre váš program, nie len všeobecný CSV.</p>
-        </li>
-        <li>
-          <b>História párovaní.</b>
-          <p>Prehľad predchádzajúcich behov (dátum, počet faktúr a platieb, výsledok), uložený len vo vašom prehliadači.</p>
         </li>
       </ol>
 
       <div class="pro-purchase">
-        <div class="pro-price-cards">
-          <div class="pro-price">
-            <div class="pro-price-amount">9&nbsp;€ <span>/ mesiac</span></div>
-            <a class="btn btn-solid" id="buy-btn-monthly" href="https://buy.stripe.com/5kQ4gt2jE7y354Cg8B4ko01" data-umami-event="buy_click" data-umami-event-plan="monthly">Kúpiť Pro, 9&nbsp;€/mesiac</a>
-          </div>
-          <div class="pro-price">
-            <div class="pro-price-amount">79&nbsp;€ <span>/ rok</span></div>
-            <a class="btn btn-solid" id="buy-btn-yearly" href="https://buy.stripe.com/cNi9ANcYi19FaoW09D4ko02" data-umami-event="buy_click" data-umami-event-plan="yearly">Kúpiť Pro, 79&nbsp;€/rok</a>
-          </div>
-          <p class="fineprint">Platba zatiaľ smeruje na e-mail, kým nie je pripravený platobný odkaz. Po zaplatení pošleme licenčný kľúč, ktorý sa vloží nižšie.</p>
+        <div class="pro-cta">
+          <p><b>Jedna licencia pre štyri nástroje.</b> Pro pre Párovač platieb sa aktivuje rovnakou licenciou ako SEPA pain.001 Doctor, SEPA pain.001 Generátor a camt.053 do Excelu: 9&nbsp;€ mesačne alebo 79&nbsp;€ ročne pre všetky štyri nástroje, DPH v cene, faktúru pošle Stripe.</p>
+          <a class="btn btn-solid" href="https://arling.sk/bankove-nastroje/" data-umami-event="bundle_click">Kúpiť Pro na arling.sk/bankove-nastroje</a>
         </div>
         <div class="pro-licence-box">
           <div class="pro-licence-status">
@@ -676,6 +673,14 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
   </div>
 </footer>
 
+<div class="sticky-cta" id="sticky-cta" hidden>
+  <div class="sticky-cta-inner">
+    <span class="sticky-cta-text">Pro pre všetky štyri nástroje: 9&nbsp;€/mesiac alebo 79&nbsp;€/rok.</span>
+    <a class="btn btn-solid" href="https://arling.sk/bankove-nastroje/" data-umami-event="bundle_click" data-umami-event-place="sticky">Kúpiť Pro</a>
+    <button type="button" class="sticky-cta-close" id="sticky-cta-close" aria-label="Zavrieť lištu">&times;</button>
+  </div>
+</div>
+
 <script type="module">
   import {
     parseRows, mapColumns as mapInvoiceColumns, match, report, toCsv,
@@ -690,7 +695,6 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
     loadToleranceSettings, saveToleranceSettings,
     buildMarkPaidExport, mergeStatementPayments,
     loadHistory, addHistoryEntry,
-    BUY_URL, BUY_URL_YEAR,
   } from './pro.js';
 
   const $ = (id) => document.getElementById(id);
@@ -701,10 +705,9 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
   let extraStatementBlocks = [];
   let lastReport = null;
 
-  // Buy buttons read the link from pro.js's BUY_URL: swap that one constant
-  // for the Stripe checkout link once it exists, nothing else to touch.
-  $('buy-btn-monthly').href = BUY_URL;
-  $('buy-btn-yearly').href = BUY_URL_YEAR;
+  // Pro is sold through the arling.sk/bankove-nastroje bundle page (see the
+  // "pro-cta" link in the Pro section above), not a standalone Stripe link
+  // on this page, so there is no per-tool BUY_URL to wire up here.
 
   // ── sample data: 6 invoices, one camt.053 statement, designed to hit
   // every one of the four output categories at once (see tests.mjs for the
@@ -1315,5 +1318,44 @@ ${SAMPLE_ENTRIES.map(sampleEntry).join('\n')}
   });
 </script>
 <script src="subscribe.js" defer></script>
+<script>
+(function () {
+  var SLUG = 'parovac-platieb';
+  function pingOwner(evt, plan) {
+    try {
+      var url = 'https://homelab.tailbf8f27.ts.net/subscribe/api/ping?e=' + encodeURIComponent(evt) + '&t=' + SLUG + (plan ? '&p=' + encodeURIComponent(plan) : '');
+      if (navigator.sendBeacon) { navigator.sendBeacon(url); }
+      else if (window.fetch) { fetch(url, { keepalive: true, mode: 'no-cors' }).catch(function () {}); }
+    } catch (e) {}
+  }
+  document.querySelectorAll('[data-umami-event="buy_click"],[data-umami-event="trial_click"],[data-umami-event="download_click"],[data-umami-event="bundle_click"]').forEach(function (el) {
+    el.addEventListener('click', function () {
+      pingOwner(el.getAttribute('data-umami-event'), el.getAttribute('data-umami-event-plan') || '');
+    });
+  });
+
+  // Sticky mobile CTA bar: shows after the hero, closable, remembered per tab.
+  var bar = document.getElementById('sticky-cta');
+  if (bar) {
+    var KEY = 'arling_sticky_closed_' + SLUG;
+    var closeBtn = document.getElementById('sticky-cta-close');
+    var hero = document.querySelector('.hero');
+    var isClosed = function () { try { return sessionStorage.getItem(KEY) === '1'; } catch (e) { return false; } };
+    var onScroll = function () {
+      if (isClosed()) { bar.hidden = true; return; }
+      var pastHero = !hero || hero.getBoundingClientRect().bottom <= 0;
+      bar.hidden = !pastHero;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function () {
+        try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
+        bar.hidden = true;
+      });
+    }
+  }
+})();
+</script>
 </body>
 </html>
