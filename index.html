@@ -296,6 +296,11 @@
   .pro-cta { border:1px solid var(--line); background:var(--paper-2); padding:24px; flex:1 1 280px; min-width:0; }
   .pro-cta p { margin:0 0 16px; color:var(--ink-2); font-size:15px; }
   .pro-cta .btn { display:inline-block; }
+  .pro-buy { display:flex; flex-wrap:wrap; gap:10px; margin:0 0 12px; }
+  .pro-buy .btn { margin:0; text-align:center; }
+  .pro-buy .btn + .btn { margin:0; }
+  .pro-cta p.fineprint { font-size:12.5px; color:var(--muted); margin:0 0 10px; }
+  .pro-cta p.pro-bundle-link { font-size:13.5px; margin:0; }
   .pro-price-cards { display:flex; flex-direction:column; gap:14px; }
   .pro-price { border:1px solid var(--line); background:var(--paper-2); padding:22px; }
   .pro-price-amount { font:400 30px/1 var(--serif); margin:0 0 14px; }
@@ -340,9 +345,17 @@
 
   /* Sticky mobile Pro bar (Paper Sell): mobile only, appears after the hero, closable. */
   .sticky-cta { position:fixed; left:0; right:0; bottom:0; z-index:30; background:var(--paper-2); border-top:1px solid var(--line); }
-  .sticky-cta-inner { display:flex; align-items:center; gap:10px; max-width:1040px; margin:0 auto; padding:10px 14px; }
-  .sticky-cta-text { flex:1 1 auto; min-width:0; font-size:12.5px; color:var(--ink-2); overflow-wrap:anywhere; }
-  .sticky-cta .btn { flex:none; padding:10px 14px; font-size:13.5px; margin:0; }
+  .sticky-cta-inner { display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px; max-width:1040px; margin:0 auto; padding:10px 14px; }
+  .sticky-cta-text { flex:1 1 160px; min-width:0; font-size:12.5px; color:var(--ink-2); overflow-wrap:anywhere; }
+  .sticky-cta-buttons { display:flex; flex-wrap:wrap; gap:8px; flex:none; }
+  .sticky-cta .btn { flex:none; padding:10px 14px; font-size:13.5px; margin:0; white-space:nowrap; }
+  .sticky-cta .btn + .btn { margin:0; }
+  @media (max-width:520px) {
+    .sticky-cta-text { flex:1 1 calc(100% - 40px); }
+    .sticky-cta-close { order:1; }
+    .sticky-cta-buttons { order:2; flex:1 1 100%; }
+    .sticky-cta-buttons .btn { flex:1 1 auto; text-align:center; }
+  }
   .sticky-cta-close { flex:none; width:30px; height:30px; border:1px solid var(--line); background:var(--paper); color:var(--ink-2); border-radius:4px; cursor:pointer; font:16px/1 var(--sans); padding:0; }
   .sticky-cta-close:hover { border-color:var(--accent); color:var(--accent); }
   @media (min-width:761px) { .sticky-cta { display:none !important; } }
@@ -377,7 +390,7 @@
       <ul class="facts">
         <li><b>4</b> banky: Tatra banka, SLSP, VÚB, ČSOB</li>
         <li><b>6</b> formátov faktúr: Pohoda, Omega, Money S3, SuperFaktúra, iDoklad, Fakturoid</li>
-        <li><b>154</b> automatizované testy</li>
+        <li><b>155</b> automatizované testy</li>
         <li><b>0 €</b>, bez limitu riadkov</li>
         <li>beží vo vašom prehliadači</li>
       </ul>
@@ -588,7 +601,12 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
       <div class="pro-purchase">
         <div class="pro-cta">
           <p><b>Jedna licencia pre štyri nástroje.</b> Pro pre Párovač platieb sa aktivuje rovnakou licenciou ako SEPA pain.001 Doctor, SEPA pain.001 Generátor a camt.053 do Excelu: 9&nbsp;€ mesačne alebo 79&nbsp;€ ročne pre všetky štyri nástroje, DPH v cene, faktúru pošle Stripe.</p>
-          <a class="btn btn-solid" href="https://arling.sk/bankove-nastroje/" data-umami-event="bundle_click">Kúpiť Pro na arling.sk/bankove-nastroje</a>
+          <div class="pro-buy">
+            <a class="btn btn-solid" id="pro-buy-yearly-btn" href="https://buy.stripe.com/cNi9ANcYi19FaoW09D4ko02" data-umami-event="buy_click" data-umami-event-plan="year" data-umami-event-place="parovac" data-umami-event-spot="pro">Kúpiť Pro, 79&nbsp;€/rok</a>
+            <a class="btn btn-line" id="pro-buy-monthly-btn" href="https://buy.stripe.com/5kQ4gt2jE7y354Cg8B4ko01" data-umami-event="buy_click" data-umami-event-plan="month" data-umami-event-place="parovac" data-umami-event-spot="pro">alebo 9&nbsp;€/mesiac</a>
+          </div>
+          <p class="fineprint">Platba cez Stripe, DPH v cene, zrušiť môžete kedykoľvek. Licenčný kľúč dostanete hneď po zaplatení na potvrdzovacej stránke.</p>
+          <p class="pro-bundle-link"><a id="pro-bundle-link" href="https://arling.sk/bankove-nastroje/" data-umami-event="bundle_click" data-umami-event-place="parovac">Čo všetko je v balíku</a></p>
         </div>
         <div class="pro-licence-box">
           <div class="pro-licence-status">
@@ -675,8 +693,11 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
 
 <div class="sticky-cta" id="sticky-cta" hidden>
   <div class="sticky-cta-inner">
-    <span class="sticky-cta-text">Pro pre všetky štyri nástroje: 9&nbsp;€/mesiac alebo 79&nbsp;€/rok.</span>
-    <a class="btn btn-solid" href="https://arling.sk/bankove-nastroje/" data-umami-event="bundle_click" data-umami-event-place="sticky">Kúpiť Pro</a>
+    <span class="sticky-cta-text">Licencia Pro pre všetky štyri nástroje, zrušiť kedykoľvek.</span>
+    <span class="sticky-cta-buttons">
+      <a class="btn btn-solid" id="sticky-buy-yearly-btn" href="https://buy.stripe.com/cNi9ANcYi19FaoW09D4ko02" data-umami-event="buy_click" data-umami-event-plan="year" data-umami-event-place="parovac" data-umami-event-spot="sticky">Kúpiť Pro, 79&nbsp;€/rok</a>
+      <a class="btn btn-line" id="sticky-buy-monthly-btn" href="https://buy.stripe.com/5kQ4gt2jE7y354Cg8B4ko01" data-umami-event="buy_click" data-umami-event-plan="month" data-umami-event-place="parovac" data-umami-event-spot="sticky">alebo 9&nbsp;€/mesiac</a>
+    </span>
     <button type="button" class="sticky-cta-close" id="sticky-cta-close" aria-label="Zavrieť lištu">&times;</button>
   </div>
 </div>
@@ -705,9 +726,13 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
   let extraStatementBlocks = [];
   let lastReport = null;
 
-  // Pro is sold through the arling.sk/bankove-nastroje bundle page (see the
-  // "pro-cta" link in the Pro section above), not a standalone Stripe link
-  // on this page, so there is no per-tool BUY_URL to wire up here.
+  // Pro is bought directly from this page through the two Stripe Payment
+  // Links in the Pro section and the mobile sticky bar (yearly first, monthly
+  // second, same links as pro.js BUY_URL_YEAR / BUY_URL and as camt.053 and
+  // the pain.001 Generator). After payment Stripe returns to this page with
+  // ?session_id=..., which handleSessionIdFromUrl() below turns into a
+  // licence key through the licence service. The bundle page stays linked
+  // as "what is in the bundle" only.
 
   // ── sample data: 6 invoices, one camt.053 statement, designed to hit
   // every one of the four output categories at once (see tests.mjs for the
