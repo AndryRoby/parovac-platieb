@@ -5,6 +5,11 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://homelab.tailbf8f27.ts.net 'sha256-hpLUjl2oEXNDE1wrrELVRW24WfTiMP7fe+aN/um/lfI=' 'sha256-VzXyL2ftOA76Nrb6s8GTI1/bUxiIvbudi2IteBEZOmI=' 'sha256-Ma0rkhoPigHx0GIzcVTTigNXX1MZ/Dl19TPQwa5DPeI=' 'sha256-mVKIpuKCUomHT1VbZNGtYsnRi6jHwazFTClsMISgvOc=' 'sha256-WwiC/EcH5Yzpxy9+bWeqM3GxVAIQa+k8JbOp2zZjGSU='; connect-src 'self' https://homelab.tailbf8f27.ts.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="theme-color" content="#0a0908">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="icon-180.png">
 <title>Párovač platieb: výpis z banky proti faktúram</title>
 <meta name="description" content="Nahrajte camt.053 výpis z banky (Tatra banka, SLSP, VÚB, ČSOB) a zoznam vydaných faktúr a za sekundu zistíte, čo je uhradené, čo čiastočne a čo treba doriešiť ručne. Zadarmo, priamo v prehliadači, nič sa neodosiela." />
 <meta property="og:type" content="website" />
@@ -14,9 +19,9 @@
 <meta property="og:locale" content="sk_SK" />
 <link rel="canonical" href="https://arling.sk/parovac-platieb/" />
 <meta property="og:image" content="https://arling.sk/parovac-platieb/icon-512.png" />
-<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+
 <link rel="alternate icon" href="favicon.ico" />
-<link rel="apple-touch-icon" href="icon-192.png" />
+
 <link rel="manifest" href="manifest.json" />
 <link rel="preload" href="/fonts/arling-sans.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/arling-serif.woff2" as="font" type="font/woff2" crossorigin>
@@ -378,26 +383,17 @@
   @media print { .sticky-cta { display:none !important; } }
 </style>
 </head>
-<body>
+<body class="noc">
 <div class="wash" aria-hidden="true"><i></i><i></i></div>
 
 <a class="skip" href="#playground">Skočiť na párovanie</a>
-<header class="top">
+<header>
   <div class="wrap bar">
-    <div class="brandwrap">
-      <a class="brand" href="https://arling.sk/">
-        <svg viewBox="0 0 488 215" width="38" height="15" aria-hidden="true" focusable="false"><path fill="#f4f4f7" fill-rule="evenodd" d="M0.00,213.00L74.00,214.00L181.00,85.00L285.00,214.00L360.00,214.00L206.00,21.00L185.00,4.00L164.00,10.00Z M221.00,0.00L263.00,50.00L395.00,50.00L409.00,55.00L419.00,76.00L401.00,96.00L313.00,98.00L411.00,214.00L487.00,214.00L422.00,139.00L457.00,123.00L482.00,88.00L482.00,48.00L463.00,19.00L417.00,0.00Z"/><path fill="#f2643c" d="M269.00,66.00L269.00,67.00L268.00,68.00L268.00,70.00L267.00,71.00L267.00,76.00L268.00,77.00L268.00,79.00L270.00,81.00L270.00,82.00L271.00,82.00L273.00,84.00L274.00,84.00L277.00,86.00L279.00,86.00L280.00,87.00L287.00,87.00L288.00,86.00L290.00,86.00L291.00,85.00L294.00,84.00L298.00,80.00L298.00,79.00L299.00,78.00L299.00,75.00L300.00,74.00L300.00,72.00L299.00,71.00L299.00,69.00L298.00,68.00L297.00,65.00L295.00,63.00L294.00,63.00L289.00,60.00L278.00,60.00L277.00,61.00L276.00,61.00L275.00,62.00L272.00,63.00Z"/></svg>
-        <b>ARLing</b>
-      </a>
-      <a class="part" href="https://arling.sk/parovac-platieb/">Párovač platieb</a>
-    </div>
-    <nav aria-label="Stránka">
-      <a href="#problem" data-umami-event="nav-parovac" data-umami-event-part="problem">Ako to funguje</a>
-      <a href="#playground" data-umami-event="nav-parovac" data-umami-event-part="playground">Párovanie</a>
-      <a href="#endpoint" data-umami-event="nav-parovac" data-umami-event-part="endpoint">API</a>
-      <a href="#pro" data-umami-event="nav-parovac" data-umami-event-part="pro">Pro</a>
-      <a href="#faq" data-umami-event="nav-parovac" data-umami-event-part="faq">Otázky</a>
-    </nav>
+    <a class="brand" href="https://arling.sk/">
+      <svg viewBox="0 0 488 215" width="38" height="15" aria-hidden="true" focusable="false"><path fill="#f4f4f7" fill-rule="evenodd" d="M0.00,213.00L74.00,214.00L181.00,85.00L285.00,214.00L360.00,214.00L206.00,21.00L185.00,4.00L164.00,10.00Z M221.00,0.00L263.00,50.00L395.00,50.00L409.00,55.00L419.00,76.00L401.00,96.00L313.00,98.00L411.00,214.00L487.00,214.00L422.00,139.00L457.00,123.00L482.00,88.00L482.00,48.00L463.00,19.00L417.00,0.00Z"/><path fill="#f2643c" d="M269.00,66.00L269.00,67.00L268.00,68.00L268.00,70.00L267.00,71.00L267.00,76.00L268.00,77.00L268.00,79.00L270.00,81.00L270.00,82.00L271.00,82.00L273.00,84.00L274.00,84.00L277.00,86.00L279.00,86.00L280.00,87.00L287.00,87.00L288.00,86.00L290.00,86.00L291.00,85.00L294.00,84.00L298.00,80.00L298.00,79.00L299.00,78.00L299.00,75.00L300.00,74.00L300.00,72.00L299.00,71.00L299.00,69.00L298.00,68.00L297.00,65.00L295.00,63.00L294.00,63.00L289.00,60.00L278.00,60.00L277.00,61.00L276.00,61.00L275.00,62.00L272.00,63.00Z"/></svg>
+      <b>ARLing</b>
+    </a>
+    <nav aria-label="Site"><a href="https://arling.sk/#tools">Nástroje</a><a href="https://arling.sk/notes/">Notes</a><a href="https://arling.sk/how-we-work/">Ako pracujeme</a><a href="mailto:andrej@arling.sk">Kontakt</a></nav>
   </div>
 </header>
 
@@ -756,25 +752,10 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
 </nav>
 
 <footer>
-  <div class="wrap">
-    <div class="cols">
-      <div><b>ARLing s. r. o.</b><br>Ivanská cesta 32E<br>821 04 Bratislava, Slovensko</div>
-      <div>IČO 56583486<br>IČ DPH SK2122352100<br><a href="mailto:andrej@arling.sk">andrej@arling.sk</a></div>
-      <div>
-        Súvisiace nástroje:
-        <nav class="index" aria-label="Súvisiace nástroje">
-          <a href="https://arling.sk/camt053-to-excel/" data-umami-event="index-nastroje" data-umami-event-tool="camt053-to-excel"><span class="t">camt.053 do Excelu</span><span class="dots"></span></a>
-          <a href="https://arling.sk/sepa-pain001-generator/" data-umami-event="index-nastroje" data-umami-event-tool="sepa-generator"><span class="t">SEPA pain.001 Generátor</span><span class="dots"></span></a>
-          <a href="https://arling.sk/sepa-pain001-doctor/" data-umami-event="index-nastroje" data-umami-event-tool="sepa-doctor"><span class="t">SEPA pain.001 Doctor</span><span class="dots"></span></a>
-          <a href="https://arling.sk/" data-umami-event="index-nastroje" data-umami-event-tool="hub"><span class="t">Všetky nástroje ARLing</span><span class="dots"></span></a>
-          <a href="llms.txt" data-umami-event="index-nastroje" data-umami-event-tool="llms"><span class="t">llms.txt</span><span class="dots"></span></a>
-          <a href="https://github.com/AndryRoby/parovac-platieb" target="_blank" rel="noopener" data-umami-event="index-nastroje" data-umami-event-tool="github"><span class="t">GitHub</span><span class="dots"></span></a>
-          <a href="https://arling.sk/privacy/" data-umami-event="index-nastroje" data-umami-event-tool="privacy"><span class="t">Súkromie</span><span class="dots"></span></a>
-        </nav>
-      </div>
-    </div>
-    <p class="footer-note">Nič neopúšťa váš prehliadač okrem anonymných počtov použitia cez self-hosted Umami (a e-mailu, ak sa prihlásite na odber nižšie).</p>
-    <p class="footer-en" lang="en"><b>In English:</b> Párovač platieb is a free, client-side tool that matches a camt.053 bank statement (Tatra banka, Slovenská sporiteľňa, VÚB, ČSOB) against a list of issued invoices (Pohoda, Omega, Money S3, SuperFaktúra, iDoklad, Fakturoid, or a plain spreadsheet): variable symbol plus amount, a proposed match by amount and due-date proximity when no VS matches, and a summed check for invoices paid in installments. Nothing you paste or upload is sent anywhere. See <a href="llms.txt">llms.txt</a> or the <a href="https://github.com/AndryRoby/parovac-platieb" target="_blank" rel="noopener">source on GitHub</a>.</p>
+  <div class="wrap foot">
+    <div><b>ARLing s. r. o.</b><br>Ivanská cesta 32E<br>821 04 Bratislava, Slovensko</div>
+    <div>IČO 56583486<br>IČ DPH SK2122352100<br><a href="mailto:andrej@arling.sk">andrej@arling.sk</a></div>
+    <div><a href="https://arling.sk/privacy/">ochrana údajov</a> · <a href="https://arling.sk/podmienky/">podmienky</a> · <a href="https://arling.sk/gdpr/">GDPR</a> · <a href="https://arling.sk/impressum/">Impressum</a> · <a href="https://arling.sk/llms.txt">llms.txt</a> · <a href="https://arling.sk/sitemap-index.xml">mapa stránky</a><br>Nástroje sú poskytované tak, ako sú, bez záruky. Anonymné počty návštev cez vlastné Umami.</div>
   </div>
 </footer>
 
