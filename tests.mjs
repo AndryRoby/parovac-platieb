@@ -12,6 +12,8 @@ import {
   DEFAULT_TOLERANCE, DEFAULT_DATE_WINDOW_DAYS,
 } from './parovac.js';
 import { parse as parseCamt, toRows as camtToRows, toCsv as camtToCsv, SAMPLE_CAMT053_XML } from './camt053.js';
+import { orez, hlavicka as ukazkaHlavicka, priponaUkazky, UKAZKA_RIADKOV } from './ukazka.js';
+import { readFileSync as _read } from 'node:fs';
 import {
   parse as parseLicence, verify as verifyLicence, isValid as isValidLicence,
   load as loadLicence, save as saveLicence, clear as clearLicence,
@@ -455,6 +457,61 @@ ok('pro: BUY_URL_YEAR is the yearly Stripe bundle link', BUY_URL_YEAR.startsWith
   eq(`pro: addHistoryEntry caps history length at HISTORY_MAX (${HISTORY_MAX})`, hist.length, HISTORY_MAX);
   eq('pro: most recently added entry is first', hist[0].invoiceCount, HISTORY_MAX + 4);
   clearHistory();
+}
+
+// ═════════════════════════ ukážka bez licencie ═════════════════════════
+//
+// Tabuľky na obrazovke sú celé a zadarmo. Stiahnutý súbor má bez licencie
+// prvých 20 riadkov a v prvom riadku napísané, že je to ukážka. Zamyká sa
+// funkcia, nie počet použití: nová relácia dá presne to isté ako stará,
+// takže inkognito okno nie je cesta okolo.
+
+{
+  const riadky = Array.from({ length: 57 }, (_, i) => ({ invoice: 'F' + i, amount: i }));
+
+  const bez = orez(riadky, false);
+  eq('bez licencie: 20 riadkov', bez.rows.length, UKAZKA_RIADKOV);
+  eq('bez licencie: orezané', bez.orezane, true);
+  eq('bez licencie: pozná celkový počet', bez.spolu, 57);
+
+  const s = orez(riadky, true);
+  eq('s licenciou: všetky riadky', s.rows.length, 57);
+  eq('s licenciou: neorezané', s.orezane, false);
+
+  const kratke = orez(riadky.slice(0, 12), false);
+  eq('krátky zoznam sa neoreže', kratke.rows.length, 12);
+  eq('krátky zoznam nie je ukážka', kratke.orezane, false);
+
+  eq('prázdny zoznam neprepadne', orez([], false).rows.length, 0);
+  eq('nič namiesto poľa neprepadne', orez(null, false).spolu, 0);
+
+  const h = ukazkaHlavicka('sk', 20, 57, 'https://arling.sk/parovac-platieb/#pro');
+  ok('hlavička hovorí, že je to ukážka', h.indexOf('UKÁŽKA') === 0, h);
+  ok('hlavička povie, koľko riadkov chýba', h.indexOf('20 z 57') !== -1, h);
+  ok('hlavička nesie adresu', h.indexOf('arling.sk') !== -1, h);
+
+  eq('ukážka má v názve súboru príponu', priponaUkazky(true), '-ukazka');
+  eq('ostrý súbor príponu nemá', priponaUkazky(false), '');
+}
+
+{
+  // Stráženie zapojenia: samotný modul môže byť v poriadku a stránka ho
+  // pritom nemusí volať. Toto je presne to miesto, kde sa paywall stratí
+  // pri najbližšej úprave sťahovania.
+  const html = _read(new URL('./index.html', import.meta.url), 'utf8');
+  ok('stránka importuje ukážku', /from '\.\/ukazka\.js'/.test(html));
+  eq('obe sťahovania prechádzajú cez orez()', (html.match(/orez\(/g) || []).length, 2);
+  eq('obe sťahovania pripíšu hlavičku ukážky', (html.match(/ukazkaHlavicka\(/g) || []).length, 2);
+  ok('názov súboru rozlíši ukážku', /priponaUkazky\(u\.orezane\)/.test(html));
+  ok('ukážka sa meria vlastnou udalosťou', /ukazka_csv/.test(html));
+  ok('pri tlačidlách je o tom veta', /id="ukazka-hint"/.test(html));
+
+  // Sľuby na stránke musia sedieť s tým, čo nástroj naozaj robí. Toto sme
+  // už raz porušili pri camt.053: stránka hlásala "bez limitov" nad
+  // tlačidlom Kúpiť.
+  ok('stránka netvrdí neobmedzené sťahovanie', !/bez limitu riadkov/.test(html));
+  ok('stránka nehovorí o všeobecnom CSV vo Free', !/Free verzia stiahne/.test(html));
+  ok('stránka vysvetlí ukážku', /prvých 20 riadkov ako ukážk/.test(html));
 }
 
 // ═══════════════════════════════ summary ═══════════════════════════════════
