@@ -7,43 +7,137 @@
 <meta name="robots" content="noindex" />
 <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
 <link rel="alternate icon" href="./favicon.ico" />
+<link rel="preload" href="/fonts/arling-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/arling-serif.woff2" as="font" type="font/woff2" crossorigin>
+<!-- Jediný zdroj vzhľadu: ops/design/paper/paper.css, sem rozkopírovaný cez ops/design/sync-paper.mjs. -->
+<link rel="stylesheet" href="/style/paper.css">
 <style>
-  :root {
-    --paper:#f6f2ea; --paper-2:#fbf9f4; --ink:#1b1a17; --ink-2:#4a4741; --muted:#66625a; --line:#d9d2c4;
-    --accent:#b23a1d; --accent-soft:#f3e2dc;
-    --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
-    --sans:system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    --mono:ui-monospace,"Cascadia Code",Consolas,Menlo,monospace;
-    color-scheme: light dark;
+  /* Len to, čo je vlastné tejto stránke. Zvyšok je v /style/paper.css. */
+  :root { color-scheme: light; }
+  .brandwrap { display:flex; align-items:center; gap:11px; min-width:0; }
+  .brandwrap .part { font-family:var(--ui); font-size:13px; color:var(--muted); text-decoration:none;
+    border-left:1px solid var(--line); padding-left:11px; white-space:nowrap; }
+  .brandwrap .part:hover { color:var(--accent); }
+
+  /* úvod má vpravo skutočný artefakt: snímku výsledku nástroja, na ktorý táto stránka vracia.
+     Rozvrhnutie 7 : 5 a rám .shot berú z paper.css, tu netreba nič prepísať. */
+  .code { font-family:var(--mono); font-size:13px; color:var(--muted); }
+
+  /* Register sekcií: na úzkom okne sa popis odsunie pod názov, inak ho vodiče vytlačia z riadka. */
+  .index { max-width:46em; }
+  @media (max-width:760px) {
+    .index a { flex-wrap:wrap; }
+    .index .t { white-space:normal; overflow:visible; }
+    .index .dots { display:none; }
+    .index .c { flex-basis:100%; padding-left:2.1em; margin-top:2px; }
   }
-  @media (prefers-color-scheme: dark) {
-    :root { --paper:#151412; --paper-2:#1d1b18; --ink:#efe9de; --ink-2:#c9c2b5; --muted:#8f887b; --line:#2e2b26; --accent:#e0623f; --accent-soft:#3a1f17; }
-  }
-  * { box-sizing:border-box; }
-  html { background:var(--paper); }
-  body {
-    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
-    color:var(--ink); background:var(--paper); font:16px/1.55 var(--sans); -webkit-font-smoothing:antialiased;
-  }
-  a { color:inherit; text-decoration-color:var(--line); text-underline-offset:3px; }
-  a:hover { text-decoration-color:var(--accent); }
-  :focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
-  .card { max-width:480px; width:100%; text-align:center; }
-  .kicker { font:400 14px/1 var(--serif); color:var(--accent); letter-spacing:.06em; text-transform:uppercase; margin:0 0 14px; }
-  h1 { font:400 clamp(26px,4.5vw,34px)/1.2 var(--serif); letter-spacing:-.01em; margin:0 0 14px; }
-  p.sub { color:var(--ink-2); font-size:15.5px; margin:0 0 28px; }
-  .btn { display:inline-block; font:600 15px/1 var(--sans); padding:13px 20px; border-radius:4px; text-decoration:none; }
-  .btn-solid { background:var(--accent); color:#fff; }
-  .btn-solid:hover { background:var(--ink); color:var(--paper); }
-  code { font:14px/1.4 var(--mono); background:var(--paper-2); border:1px solid var(--line); border-radius:3px; padding:1px 5px; }
+
+  /* Tretia plocha: pätička na atramente. */
+  footer.band { background:var(--ink); color:#a8a294; border-top:none; padding:44px 0 60px; }
+  footer.band a { color:#e9e4d8; }
+  footer.band a:hover { color:var(--accent-light); }
 </style>
 </head>
 <body>
-  <div class="card">
-    <p class="kicker">Párovač platieb</p>
-    <h1>Táto stránka neexistuje.</h1>
-    <p class="sub">Ani vo výpise z banky by ste ju nenašli. Vráťte sa a namiesto nej spárujte svoj <code>camt.053</code> výpis s faktúrami.</p>
-    <a class="btn btn-solid" href="./">Späť na Párovač platieb</a>
+<div class="wash" aria-hidden="true"><i></i><i></i></div>
+
+<header>
+  <div class="wrap bar">
+    <div class="brandwrap">
+      <a class="brand" href="https://arling.sk/">
+        <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><defs><path id="m" fill-rule="evenodd" d="M16 2.5 L29 29.5 H3 Z M16 12.4 L22.4 25.6 H9.6 Z"/><clipPath id="mr"><rect x="16" width="16" height="32"/></clipPath></defs><use href="#m" fill="#141413"/><use href="#m" fill="#b23a1d" clip-path="url(#mr)"/></svg>
+        <b>ARLing</b>
+      </a>
+      <a class="part" href="./">Párovač platieb</a>
+    </div>
+    <nav aria-label="Stránka">
+      <a href="./#playground" data-umami-event="nav-404" data-umami-event-part="playground">Párovanie</a>
+      <a href="./#pro" data-umami-event="nav-404" data-umami-event-part="pro">Pro</a>
+      <a href="./#faq" data-umami-event="nav-404" data-umami-event-part="faq">Otázky</a>
+    </nav>
   </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div>
+      <p class="kicker r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>Párovač platieb</p>
+      <h1 id="h1"><span class="l">Táto stránka</span>
+        <span class="l">neexistuje.</span></h1>
+      <p class="lead r d3">Ani vo výpise z banky by ste ju nenašli. Vráťte sa a namiesto nej spárujte svoj <code>camt.053</code> výpis s faktúrami.</p>
+      <div class="cta r d4">
+        <a class="btn btn-solid" href="./" data-umami-event="back_to_parovac" data-umami-event-place="404">Späť na Párovač platieb</a>
+      </div>
+      <p class="proof r d5"><span class="code">404</span> &middot; arling.sk/parovac-platieb/</p>
+    </div>
+    <div class="r d3">
+      <div class="shot">
+        <div class="chrome"><i></i><i></i><i></i></div>
+        <!-- Na desktope je tento obrázok nad ohybom, teda LCP prvok, preto fetchpriority="high"
+             a žiadne loading="lazy", ktoré by ho odsunulo na koniec fronty. -->
+        <img src="/press/parovac-platieb-2-results.webp" width="1230" height="631" fetchpriority="high" decoding="async"
+             alt="Výsledok párovania v nástroji Párovač platieb: štyri spárované faktúry, jeden preplatok, jedna faktúra po splatnosti a jedna nespárovaná platba.">
+      </div>
+    </div>
+  </div>
+
+  <section class="deep">
+    <div class="wrap">
+      <p class="kicker r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>01</p>
+      <h2 class="r d1">Všetky sekcie nástroja.</h2>
+      <div class="rule"></div>
+      <nav class="index r d2" aria-label="Sekcie">
+        <a href="./#problem" data-umami-event="index-parovac" data-umami-event-part="problem"><span class="n">01</span><span class="t">Ako to funguje</span><span class="dots"></span><span class="c">tri veci, ktoré zaberú čas</span></a>
+        <a href="./#playground" data-umami-event="index-parovac" data-umami-event-part="playground"><span class="n">02</span><span class="t">Párovanie</span><span class="dots"></span><span class="c">faktúry a výpis</span></a>
+        <a href="./#endpoint" data-umami-event="index-parovac" data-umami-event-part="endpoint"><span class="n">03</span><span class="t">API</span><span class="dots"></span><span class="c">parovac.js, 0 závislostí</span></a>
+        <a href="./#pro" data-umami-event="index-parovac" data-umami-event-part="pro"><span class="n">04</span><span class="t">Pro</span><span class="dots"></span><span class="c">9 € mesačne alebo 79 € ročne</span></a>
+        <a href="./#faq" data-umami-event="index-parovac" data-umami-event-part="faq"><span class="n">05</span><span class="t">Otázky</span><span class="dots"></span><span class="c">6 odpovedí</span></a>
+      </nav>
+    </div>
+  </section>
+</main>
+
+<footer class="band">
+  <div class="wrap foot">
+    <span>ARLing s. r. o., Bratislava</span>
+    <span><a href="./" data-umami-event="index-nastroje" data-umami-event-tool="parovac">Párovač platieb</a> &middot; <a href="https://arling.sk/" data-umami-event="index-nastroje" data-umami-event-tool="hub">Všetky nástroje ARLing</a> &middot; <a href="mailto:andrej@arling.sk" data-umami-event="index-nastroje" data-umami-event-tool="mail">andrej@arling.sk</a></span>
+  </div>
+</footer>
+
+<script>
+/* Pohyb podľa ops/design/paper-v2.md, sekcia 7: príchod sekcií cez IntersectionObserver,
+   nadpis po slovách. Žiadna knižnica, žiadny externý skript, žiadny requestAnimationFrame
+   v slučke, prefers-reduced-motion vypína všetko. */
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduce) {
+    document.querySelectorAll('section, .hero, .r').forEach(function (e) { e.classList.add('in'); });
+  } else {
+    var hero = document.querySelector('.hero');
+    if (hero) requestAnimationFrame(function () { hero.classList.add('in'); });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.1 });
+    document.querySelectorAll('section').forEach(function (s) { io.observe(s); });
+  }
+
+  // nadpis sa objaví po slovách, ako dobre vytlačený titulok
+  var h1 = document.getElementById('h1');
+  if (h1) {
+    var i = 0;
+    Array.prototype.forEach.call(h1.querySelectorAll('.l'), function (line) {
+      line.innerHTML = line.textContent.split(' ').map(function (w) {
+        var d = (i++ * 0.06).toFixed(2);
+        return '<span class="w" style="transition-delay:' + d + 's">' + w + '</span>';
+      }).join(' ');
+    });
+    if (reduce) { h1.classList.add('in'); }
+    else { requestAnimationFrame(function () { h1.classList.add('in'); }); }
+  }
+})();
+</script>
 </body>
 </html>
