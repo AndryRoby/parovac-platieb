@@ -804,44 +804,44 @@ export function report(matchResult, opts) {
 
 // Column sets for toCsv(), one per report() list.
 export const MATCHED_COLUMNS = [
-  { key: 'invoiceNumber', label: 'Číslo faktúry' },
+  { key: 'invoiceNumber', label: 'Číslo faktúry', en: 'Invoice number', de: 'Rechnungsnummer' },
   { key: 'vs', label: 'VS' },
-  { key: 'customer', label: 'Odberateľ' },
-  { key: 'invoiceAmount', label: 'Suma faktúry', amount: true },
-  { key: 'paidAmount', label: 'Uhradené', amount: true },
-  { key: 'diff', label: 'Rozdiel', amount: true },
-  { key: 'dueDate', label: 'Splatnosť' },
-  { key: 'paymentDate', label: 'Dátum platby' },
-  { key: 'currency', label: 'Mena' },
-  { key: 'proposal', label: 'Návrh' },
+  { key: 'customer', label: 'Odberateľ', en: 'Customer', de: 'Kunde' },
+  { key: 'invoiceAmount', label: 'Suma faktúry', en: 'Invoice amount', de: 'Rechnungsbetrag', amount: true },
+  { key: 'paidAmount', label: 'Uhradené', en: 'Paid', de: 'Bezahlt', amount: true },
+  { key: 'diff', label: 'Rozdiel', en: 'Difference', de: 'Differenz', amount: true },
+  { key: 'dueDate', label: 'Splatnosť', en: 'Due date', de: 'Fällig am' },
+  { key: 'paymentDate', label: 'Dátum platby', en: 'Payment date', de: 'Zahlungsdatum' },
+  { key: 'currency', label: 'Mena', en: 'Currency', de: 'Währung' },
+  { key: 'proposal', label: 'Návrh', en: 'Suggestion', de: 'Vorschlag' },
 ];
 
 export const PARTIAL_COLUMNS = MATCHED_COLUMNS.filter((c) => c.key !== 'proposal');
 
 export const OVERDUE_COLUMNS = [
-  { key: 'invoiceNumber', label: 'Číslo faktúry' },
+  { key: 'invoiceNumber', label: 'Číslo faktúry', en: 'Invoice number', de: 'Rechnungsnummer' },
   { key: 'vs', label: 'VS' },
-  { key: 'customer', label: 'Odberateľ' },
-  { key: 'invoiceAmount', label: 'Suma', amount: true },
-  { key: 'dueDate', label: 'Splatnosť' },
-  { key: 'daysOverdue', label: 'Dní po splatnosti' },
-  { key: 'currency', label: 'Mena' },
+  { key: 'customer', label: 'Odberateľ', en: 'Customer', de: 'Kunde' },
+  { key: 'invoiceAmount', label: 'Suma', en: 'Amount', de: 'Betrag', amount: true },
+  { key: 'dueDate', label: 'Splatnosť', en: 'Due date', de: 'Fällig am' },
+  { key: 'daysOverdue', label: 'Dní po splatnosti', en: 'Days overdue', de: 'Tage überfällig' },
+  { key: 'currency', label: 'Mena', en: 'Currency', de: 'Währung' },
 ];
 
 export const UNMATCHED_PAYMENTS_COLUMNS = [
   { key: 'vs', label: 'VS' },
-  { key: 'counterparty', label: 'Protistrana' },
-  { key: 'amount', label: 'Suma', amount: true },
-  { key: 'date', label: 'Dátum' },
-  { key: 'message', label: 'Správa' },
-  { key: 'ref', label: 'Referencia' },
-  { key: 'currency', label: 'Mena' },
+  { key: 'counterparty', label: 'Protistrana', en: 'Counterparty', de: 'Gegenpartei' },
+  { key: 'amount', label: 'Suma', en: 'Amount', de: 'Betrag', amount: true },
+  { key: 'date', label: 'Dátum', en: 'Date', de: 'Datum' },
+  { key: 'message', label: 'Správa', en: 'Message', de: 'Verwendungszweck' },
+  { key: 'ref', label: 'Referencia', en: 'Reference', de: 'Referenz' },
+  { key: 'currency', label: 'Mena', en: 'Currency', de: 'Währung' },
 ];
 
 export const MARK_PAID_COLUMNS = [
-  { key: 'invoiceNumber', label: 'Číslo faktúry' },
-  { key: 'paidDate', label: 'Dátum úhrady' },
-  { key: 'paidAmount', label: 'Suma', amount: true },
+  { key: 'invoiceNumber', label: 'Číslo faktúry', en: 'Invoice number', de: 'Rechnungsnummer' },
+  { key: 'paidDate', label: 'Dátum úhrady', en: 'Payment date', de: 'Zahlungsdatum' },
+  { key: 'paidAmount', label: 'Suma', en: 'Amount', de: 'Betrag', amount: true },
 ];
 
 function csvCell(value, delimiter) {
