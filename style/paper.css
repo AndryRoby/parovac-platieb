@@ -89,7 +89,7 @@ header{border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;
 .langsel a{display:block;padding:7px 10px;border-radius:8px;text-decoration:none;color:var(--body);white-space:nowrap}
 .langsel a:hover{background:var(--paper-deep);color:var(--ink)}
 .langsel a[aria-current="true"]{color:var(--accent);font-weight:500}
-@media (max-width:720px){ .langsel{order:2} }
+@media (max-width:960px){ .langsel{order:2} }
 
 /* ── 6. Typografia ── */
 h1{font:700 clamp(34px,4.6vw,64px)/1.1 var(--display);color:var(--ink);letter-spacing:-.02em;margin:0 0 clamp(14px,1.6vw,22px)}
@@ -687,7 +687,10 @@ body.noc .zar-plocha{opacity:1}
 .bar{gap:clamp(16px,3vw,40px)}
 .bar nav{margin-left:auto;display:flex;align-items:center;gap:clamp(14px,1.6vw,26px)}
 .bar .langsel{margin-left:clamp(10px,1.4vw,20px)}
-@media (max-width:720px){
+/* Hranica je 960, nie 720: pri 768 px hlavicka pretekala von z obrazovky,
+   "Kontakt" bol odsekly a prepinac jazykov sa nedal dosiahnut. Realny prah,
+   kde sa vsetko este zmesti do riadku, je okolo 930 px. */
+@media (max-width:960px){
   .bar{flex-wrap:wrap;row-gap:8px}
   /* Navigacia je na uzkej obrazovke jeden posuvatelny riadok.
      Bez white-space:nowrap sa dlhe polozky ("Ako to funguje") zalomili
