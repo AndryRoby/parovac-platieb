@@ -17,7 +17,10 @@
 <link rel="alternate icon" href="favicon.ico" />
 <link rel="apple-touch-icon" href="icon-192.png" />
 <link rel="manifest" href="manifest.json" />
-<!-- Bez externého font CDN: len systémový font stack (viď body { font-family } nižšie). -->
+<link rel="preload" href="/fonts/arling-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/arling-serif.woff2" as="font" type="font/woff2" crossorigin>
+<!-- Jediný zdroj vzhľadu: ops/design/paper/paper.css, sem rozkopírovaný cez ops/design/sync-paper.mjs. -->
+<link rel="stylesheet" href="/style/paper.css">
 <script defer src="https://homelab.tailbf8f27.ts.net/script.js" data-website-id="b5d77fa5-7b17-4bad-9c61-30eff842cf12"></script>
 
 <script type="application/ld+json">
@@ -120,100 +123,92 @@
 </script>
 
 <style>
-  :root {
-    --paper:#f6f2ea; --paper-2:#fbf9f4; --ink:#1b1a17; --ink-2:#4a4741; --muted:#66625a; --line:#d9d2c4;
-    --accent:#b23a1d; --accent-soft:#f3e2dc; --ok:#2f6f3e; --ok-soft:#e3ede4; --warn:#9a6b00;
-    --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
-    --sans:system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    --mono:ui-monospace,"Cascadia Code",Consolas,Menlo,monospace;
-    color-scheme: light dark;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --paper:#151412; --paper-2:#1d1b18; --ink:#efe9de; --ink-2:#c9c2b5; --muted:#8f887b; --line:#2e2b26; --accent:#e0623f; --accent-soft:#3a1f17; --ok:#7fbf8e; --ok-soft:#1c2b1e; --warn:#caa552; }
-  }
-  * { box-sizing:border-box; }
-  html { background:var(--paper); }
-  body { margin:0; color:var(--ink); background:var(--paper); font:16px/1.55 var(--sans); -webkit-font-smoothing:antialiased; }
-  a { color:inherit; text-decoration-color:var(--line); text-underline-offset:3px; }
-  a:hover { text-decoration-color:var(--accent); }
-  :focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
-  img { max-width:100%; height:auto; display:block; }
+  /* Len to, čo je vlastné tomuto nástroju. Farby, písma, nadpisy, tlačidlá, hlavička,
+     pätička, tabuľky, karty a pohyb sú v /style/paper.css, ktorý je načítaný vyššie. */
+  :root { color-scheme: light; --warn:#8a5f00; --accent-soft:#f3e2dc; }
+  /* nástroj skrýva a odkrýva bloky cez atribút hidden, preto musí prebiť aj display:flex */
   [hidden] { display:none !important; }
-  .skip { position:absolute; left:-999px; top:8px; background:var(--ink); color:var(--paper); padding:8px 12px; z-index:10; }
-  .skip:focus { left:8px; }
-  .wrap { max-width:1080px; margin:0 auto; padding:0 24px; }
-  code { font:13.5px/1.4 var(--mono); background:var(--paper-2); border:1px solid var(--line); border-radius:3px; padding:1px 5px; overflow-wrap:anywhere; }
 
-  header.top { border-bottom:1px solid var(--line); }
-  header.top .wrap { display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px 24px; padding:18px 24px; }
-  .brand { display:flex; align-items:baseline; flex-wrap:wrap; gap:2px 10px; min-width:0; }
-  .wordmark { font:600 21px/1.25 var(--serif); text-decoration:none; overflow-wrap:anywhere; }
-  .wordmark-sub { font:13px/1 var(--sans); color:var(--muted); letter-spacing:.02em; text-decoration:none; white-space:nowrap; }
-  .wordmark-sub:hover { color:var(--accent); }
-  nav.main { display:flex; flex-wrap:wrap; }
-  nav.main a { font-size:14px; margin-left:20px; text-decoration:none; color:var(--ink-2); white-space:nowrap; }
-  nav.main a:first-child { margin-left:0; }
-  nav.main a:hover { color:var(--accent); }
+  /* hlavička je prilepená hore, takže kotvy potrebujú odstup, nech ich neprekryje */
+  section[id], #hero { scroll-margin-top:78px; }
 
-  .hero { padding:64px 0 40px; border-bottom:1px solid var(--line); }
-  .hero h1 { font:400 clamp(30px,4.6vw,46px)/1.14 var(--serif); letter-spacing:-.01em; margin:0 0 18px; max-width:24ch; }
-  .hero p.lead { font-size:18px; color:var(--ink-2); max-width:62ch; margin:0 0 26px; }
-  .facts { list-style:none; margin:22px 0 0; padding:0; display:flex; flex-wrap:wrap; gap:8px 0; color:var(--muted); font-size:14px; }
-  .facts li + li::before { content:"·"; margin:0 10px; color:var(--line); }
+  /* hlavička: monogram, wordmark, tenká linka, názov nástroja */
+  .brandwrap { display:flex; align-items:center; gap:11px; min-width:0; }
+  .brandwrap .part { font-family:var(--ui); font-size:13px; color:var(--muted); text-decoration:none;
+    border-left:1px solid var(--line); padding-left:11px; white-space:nowrap; }
+  .brandwrap .part:hover { color:var(--accent); }
+
+  /* úvod: register s bodkovanými vodičmi. Na úzkom okne sa popis odsunie pod názov,
+     inak by ho vodiče vytlačili z riadka. */
+  .hero .index { max-width:46em; }
+  @media (max-width:760px) {
+    .index a { flex-wrap:wrap; }
+    .index .t { white-space:normal; overflow:visible; }
+    .index .dots { display:none; }
+    .index .c { flex-basis:100%; padding-left:2.1em; margin-top:2px; }
+  }
+
+  /* úvod: riadok faktov pod tlačidlami. Oddeľovač visí na konci položky, aby
+     po zalomení nezačínal riadok bodkou. */
+  .facts { list-style:none; margin:22px 0 0; padding:0; display:flex; flex-wrap:wrap; align-items:baseline; gap:0 10px; }
+  .facts li::after { content:" ·"; color:var(--line); }
+  .facts li:last-child::after { content:""; }
   .facts b { color:var(--ink); font-weight:600; }
 
-  .btn { display:inline-block; font:600 15px/1 var(--sans); padding:13px 18px; border-radius:4px; text-decoration:none; cursor:pointer; border:2px solid transparent; appearance:none; -webkit-appearance:none; }
-  .btn-solid { background:var(--accent); color:#fff; border-color:var(--accent); }
-  .btn-solid:hover { background:var(--ink); border-color:var(--ink); color:var(--paper); }
-  .btn-line { border:2px solid var(--ink); color:var(--ink); background:transparent; }
-  .btn-line:hover { border-color:var(--accent); color:var(--accent); }
-  .btn + .btn { margin-left:10px; }
-  .btn:disabled { opacity:.6; cursor:default; }
+  /* bočný register: polohu aj hranicu viditeľnosti určuje /style/paper.css, sekcia 15.
+     Stránka drží celú šírku --wrap, takže si hranicu neposúva. */
 
-  section { padding:44px 0; border-bottom:1px solid var(--line); }
-  section[id], header.top { scroll-margin-top:14px; }
-  .kicker { font:400 14px/1 var(--serif); color:var(--accent); letter-spacing:.06em; text-transform:uppercase; margin:0 0 10px; }
-  h2 { font:400 28px/1.2 var(--serif); margin:0 0 8px; letter-spacing:-.005em; max-width:32ch; }
-  .sub { color:var(--ink-2); max-width:66ch; margin:0 0 24px; }
+  /* číslované trojice: problémy a čo je v Pro */
+  .rules { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));
+    gap:var(--gap); margin:0; padding:0; list-style:none; counter-reset:r; }
+  .rules li { min-width:0; }
+  .rules li::before { counter-increment:r; content:counter(r,decimal-leading-zero);
+    font:500 12px/1 var(--ui); letter-spacing:.12em; color:var(--accent); display:block; margin-bottom:9px; }
+  .rules b { display:block; color:var(--ink); font-weight:600; margin-bottom:5px; }
+  .rules p { margin:0; font-size:clamp(15px,1.05vw,17px); overflow-wrap:anywhere; }
+  .sub { max-width:66ch; margin:0 0 26px; }
 
-  .rules { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:26px 32px; margin:0; padding:0; list-style:none; counter-reset:r; }
-  .rules li { padding-top:14px; border-top:1px solid var(--line); min-width:0; }
-  .rules li::before { counter-increment:r; content:counter(r,decimal-leading-zero); font:400 14px/1 var(--serif); color:var(--accent); display:block; margin-bottom:8px; }
-  .rules b { display:block; font-weight:600; margin-bottom:4px; }
-  .rules p { margin:0; color:var(--ink-2); font-size:15px; overflow-wrap:anywhere; }
-
-  .play { border:1px solid var(--line); background:var(--paper); min-width:0; }
+  /* ── nástroj: dva panely, ovládací pás, výsledky ───────────────────── */
+  .play { border:1px solid var(--line); border-radius:var(--radius); background:var(--card);
+    box-shadow:0 2px 6px rgba(20,20,19,.04); overflow:hidden; min-width:0; }
   .play-body { display:grid; grid-template-columns:1fr 1fr; }
   @media (max-width:900px) { .play-body { grid-template-columns:minmax(0,1fr); } }
   .pane { min-width:0; display:flex; flex-direction:column; }
   .pane + .pane { border-left:1px solid var(--line); }
   @media (max-width:900px) { .pane + .pane { border-left:none; border-top:1px solid var(--line); } }
-  .pane-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 16px; border-bottom:1px solid var(--line); background:var(--paper-2); flex-wrap:wrap; }
+  /* min-height: hlavičky oboch panelov musia končiť v rovnakej výške, inak sa deliaca
+     linka medzi nimi zalomí. Pravá je vyššia o tlačidlo s odznakom PRO. */
+  .pane-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 16px;
+    min-height:56px; border-bottom:1px solid var(--line); background:var(--paper-deep); flex-wrap:wrap; }
   .pane-title { font:12px/1 var(--mono); letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
   .pane-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .pane-head select { max-width:100%; }
 
-  .icon-btn { font:12.5px/1 var(--mono); padding:7px 10px; border:1px solid var(--line); background:var(--paper); color:var(--ink-2); border-radius:4px; cursor:pointer; }
+  .icon-btn { font:12.5px/1 var(--mono); padding:8px 11px; border:1px solid var(--line); background:var(--card);
+    color:var(--body); border-radius:9px; cursor:pointer; }
   .icon-btn:hover { border-color:var(--accent); color:var(--accent); }
   .icon-btn.primary { background:var(--accent); color:#fff; border-color:var(--accent); font-weight:600; }
-  .icon-btn.primary:hover { background:var(--ink); border-color:var(--ink); color:var(--paper); }
+  .icon-btn.primary:hover { background:var(--accent-dark); border-color:var(--accent-dark); color:#fff; }
   .icon-btn:disabled { opacity:.55; cursor:default; }
-  .icon-btn:disabled:hover { border-color:var(--line); color:var(--ink-2); }
+  .icon-btn:disabled:hover { border-color:var(--line); color:var(--body); }
   select:disabled, input:disabled { opacity:.55; cursor:default; }
 
   .form-section { display:flex; flex-direction:column; gap:10px; min-width:0; padding:16px; }
-  .form-section-title { font:12px/1 var(--mono); letter-spacing:.04em; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--line); padding-bottom:6px; display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; }
-  .form-section-title .hint-inline { text-transform:none; font:11.5px/1.4 var(--sans); color:var(--muted); letter-spacing:0; }
+  .form-section-title { font:12px/1 var(--mono); letter-spacing:.04em; text-transform:uppercase; color:var(--muted);
+    border-bottom:1px solid var(--line); padding-bottom:6px; display:flex; justify-content:space-between;
+    align-items:baseline; gap:8px; flex-wrap:wrap; }
   .field { display:flex; flex-direction:column; gap:5px; min-width:0; }
-  .field label { font-size:12px; color:var(--muted); font-family:var(--sans); }
+  .field label { font:12px/1.35 var(--ui); color:var(--muted); }
   .field input[type="text"], .field input[type="number"], .field input[type="file"], .field select {
-    background:var(--paper-2); color:var(--ink); border:1px solid var(--line); border-radius:4px;
-    padding:8px 10px; font:13px/1.4 var(--mono); outline:none; width:100%;
+    background:var(--paper); color:var(--ink); border:1px solid var(--line); border-radius:9px;
+    padding:9px 10px; font:13px/1.4 var(--mono); outline:none; width:100%;
   }
-  .field input[type="file"] { font-family:var(--sans); font-size:12.5px; padding:7px 9px; }
+  .field input[type="file"] { font:12.5px/1.4 var(--ui); padding:8px 9px; }
   .field input:focus, .field select:focus { border-color:var(--accent); }
-  .field .hint { font-size:11px; color:var(--muted); font-family:var(--sans); }
+  .field .hint { font:11.5px/1.5 var(--ui); color:var(--muted); }
 
-  .json-in { width:100%; background:var(--paper-2); color:var(--ink); border:1px solid var(--line); border-radius:4px; resize:vertical; padding:12px 14px; font:13px/1.6 var(--mono); tab-size:2; min-height:150px; }
+  .json-in { width:100%; background:var(--paper); color:var(--ink); border:1px solid var(--line); border-radius:9px;
+    resize:vertical; padding:12px 14px; font:13px/1.6 var(--mono); tab-size:2; min-height:150px; }
   .json-in:focus { outline:none; border-color:var(--accent); }
 
   .mapping-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); gap:8px 10px; }
@@ -221,173 +216,209 @@
   .mapping-grid .field select { padding:6px 7px; font-size:12px; }
 
   .pro-row { border-top:1px solid var(--line); padding-top:12px; margin-top:2px; display:flex; flex-direction:column; gap:8px; }
-  .pro-row-label { font-size:11px; color:var(--muted); font-family:var(--sans); display:flex; align-items:center; gap:6px; }
+  .pro-row-label { font:11.5px/1.4 var(--ui); color:var(--muted); display:flex; align-items:center; gap:6px; }
   .pro-row-controls { display:flex; gap:8px; flex-wrap:wrap; }
   .pro-row-controls select { flex:1 1 160px; min-width:0; }
 
-  .stmt-block, .pro-block { border:1px solid var(--line); background:var(--paper-2); padding:10px; display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+  .stmt-block, .pro-block { border:1px solid var(--line); border-radius:10px; background:var(--paper);
+    padding:10px; display:flex; flex-direction:column; gap:8px; margin-top:10px; }
   .pro-block-head { display:flex; justify-content:space-between; align-items:center; font:11.5px/1 var(--mono); color:var(--muted); }
 
-  .hint { font-size:12.5px; color:var(--muted); line-height:1.5; }
+  .hint { font:12.5px/1.55 var(--ui); color:var(--muted); }
   .hint.err-text { color:var(--accent); }
 
-  .control-bar { border-top:1px solid var(--line); background:var(--paper-2); padding:16px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:16px; align-items:flex-end; }
+  .control-bar { border-top:1px solid var(--line); background:var(--paper-deep); padding:16px; display:flex;
+    flex-wrap:wrap; justify-content:space-between; gap:16px; align-items:flex-end; }
   .control-fields { display:flex; flex-wrap:wrap; gap:12px 20px; align-items:flex-end; }
-  .control-fields .field { width:200px; }
-  .kbd { font:11px/1 var(--mono); padding:2px 6px; border-radius:3px; border:1px solid var(--line); background:var(--paper-2); color:var(--ink-2); }
+  .control-fields .field { width:200px; max-width:100%; }
 
-  .pro-badge { display:inline-flex; align-items:center; font:700 10px/1 var(--sans); letter-spacing:.04em; color:var(--accent); border:1px solid var(--accent); border-radius:3px; padding:3px 6px; text-decoration:none; vertical-align:1px; }
+  .pro-badge { display:inline-flex; align-items:center; font:700 10px/1 var(--ui); letter-spacing:.05em;
+    color:var(--accent); border:1px solid var(--accent); border-radius:5px; padding:3px 6px;
+    text-decoration:none; vertical-align:1px; }
   .pro-badge:hover { background:var(--accent); color:#fff; }
 
   .results-box { border-top:1px solid var(--line); padding:20px; }
   .summary-chips { display:flex; flex-wrap:wrap; gap:8px 20px; margin:0 0 18px; }
-  .summary-chip { font:13px/1 var(--sans); color:var(--ink-2); }
-  .summary-chip b { color:var(--ink); font:600 15px/1 var(--serif); margin-right:4px; }
+  .summary-chip { font:13px/1.4 var(--ui); color:var(--body); }
+  .summary-chip b { color:var(--ink); font:600 16px/1 var(--display); margin-right:4px; }
 
   .tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
-  .tab-btn { font:600 12.5px/1 var(--sans); padding:8px 12px; border:1px solid var(--line); background:var(--paper); color:var(--ink-2); border-radius:4px; cursor:pointer; }
+  .tab-btn { font:600 12.5px/1 var(--ui); padding:9px 13px; border:1px solid var(--line); background:var(--card);
+    color:var(--body); border-radius:9px; cursor:pointer; }
   .tab-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
   .tab-btn:not(.active):hover { border-color:var(--accent); color:var(--accent); }
 
-  .table-scroll { overflow-x:auto; border:1px solid var(--line); }
-  .rtable { width:100%; border-collapse:collapse; font-size:12.5px; min-width:560px; }
-  .rtable th, .rtable td { padding:7px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
-  .rtable th { font-family:var(--sans); font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); background:var(--paper-2); white-space:nowrap; }
-  .rtable td { max-width:220px; overflow-wrap:anywhere; }
-  .rtable tr:last-child td { border-bottom:none; }
-  .rtable td.num, .rtable th.num { text-align:right; white-space:nowrap; font-family:var(--mono); }
-  .badge-navrh { display:inline-block; font:700 10px/1 var(--sans); letter-spacing:.03em; text-transform:uppercase; color:var(--warn); border:1px solid var(--warn); border-radius:3px; padding:3px 6px; }
+  /* výsledková tabuľka nástroja: na širokom okne vodorovný posun, na mobile riadky (paper.css) */
+  .rtable { font-size:13px; }
+  @media (min-width:601px) { .rtable { min-width:560px; } }
+  .rtable td { overflow-wrap:anywhere; }
+  /* Strop šírky bunky platí len kým je tabuľka tabuľkou. Pod 600 px sa riadok mení na kartu
+     (paper.css, sekcia 12) a strop by tam skrátil linky medzi bunkami na dve tretiny karty. */
+  @media (min-width:601px) { .rtable td { max-width:240px; } }
+  /* .num je v paper.css číslo sekcie v akcente; tu znamená číselný stĺpec, preto sa prebíja */
+  .rtable td.num, .rtable th.num { text-align:right; white-space:nowrap; font-family:var(--mono);
+    letter-spacing:normal; margin:0; }
+  .rtable td.num { color:var(--body); font-size:13px; }
+  .rtable th.num { color:var(--muted); font:500 13px/1.3 var(--ui); letter-spacing:.04em; }
+  @media (max-width:600px) { .rtable td.num, .rtable th.num { text-align:left; } }
+  .badge-navrh { display:inline-block; font:700 10px/1 var(--ui); letter-spacing:.04em; text-transform:uppercase;
+    color:var(--warn); border:1px solid var(--warn); border-radius:5px; padding:3px 6px; }
 
   .csv-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:12px; }
-
   .markpaid-block { border-top:1px solid var(--line); padding-top:18px; margin-top:20px; }
   .markpaid-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px; }
-  .markpaid-row select { padding:8px 10px; font:13px/1.3 var(--mono); border:1px solid var(--line); border-radius:4px; background:var(--paper-2); color:var(--ink); }
+  .markpaid-row select { padding:9px 10px; font:13px/1.3 var(--mono); border:1px solid var(--line);
+    border-radius:9px; background:var(--paper); color:var(--ink); max-width:100%; }
 
-  .pro-history-panel { border:1px solid var(--line); background:var(--paper-2); padding:10px 14px; margin-top:12px; display:flex; flex-direction:column; gap:8px; max-height:260px; overflow:auto; }
-  .pro-history-item { font-size:12px; border-bottom:1px solid var(--line); padding-bottom:8px; }
+  .pro-history-panel { border:1px solid var(--line); border-radius:10px; background:var(--paper); padding:10px 14px;
+    margin-top:12px; display:flex; flex-direction:column; gap:8px; max-height:260px; overflow:auto; }
+  .pro-history-item { font-size:12.5px; border-bottom:1px solid var(--line); padding-bottom:8px; }
   .pro-history-item:last-child { border-bottom:none; padding-bottom:0; }
-  .pro-history-meta { color:var(--ink-2); overflow-wrap:anywhere; }
+  .pro-history-meta { color:var(--body); overflow-wrap:anywhere; }
   .pro-history-meta b { color:var(--ink); }
   .pro-history-empty { color:var(--muted); font-size:12.5px; margin:0; }
 
-  .endpoint { display:grid; grid-template-columns:1fr 1fr; gap:28px; align-items:start; }
+  /* ── ukážka volania ────────────────────────────────────────────────── */
+  .endpoint { display:grid; grid-template-columns:1fr 1fr; gap:var(--gap); align-items:start; }
   @media (max-width:820px) { .endpoint { grid-template-columns:minmax(0,1fr); } }
-  .codeblock { border:1px solid var(--line); background:var(--paper-2); min-width:0; }
-  .codeblock-head { padding:10px 14px; border-bottom:1px solid var(--line); background:var(--paper); font:11px/1 var(--mono); letter-spacing:.04em; text-transform:uppercase; color:var(--muted); display:flex; justify-content:space-between; align-items:center; }
-  .codeblock pre { margin:0; padding:16px 18px; font-size:12.5px; line-height:1.7; overflow-x:auto; color:var(--ink-2); font-family:var(--mono); }
-  .endpoint-copy p { margin:0 0 14px; color:var(--ink-2); font-size:15px; line-height:1.6; }
-  .fineprint { font-size:12px; color:var(--muted); line-height:1.6; margin:0; }
+  .codeblock { border:1px solid var(--line); border-radius:var(--radius); background:var(--card); min-width:0; overflow:hidden; }
+  .codeblock-head { padding:10px 14px; border-bottom:1px solid var(--line); background:var(--paper-deep);
+    font:11px/1 var(--mono); letter-spacing:.04em; text-transform:uppercase; color:var(--muted);
+    display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .codeblock pre { margin:0; border:none; border-radius:0; background:none; padding:16px 18px;
+    font-size:12.5px; line-height:1.7; color:var(--body); }
+  .endpoint-copy p { margin:0 0 14px; }
+  .fineprint { font:12.5px/1.6 var(--ui); color:var(--muted); margin:0; }
 
-  .ask { display:flex; flex-wrap:wrap; align-items:center; gap:14px 24px; margin-top:6px; }
-  .ask p { margin:0; color:var(--ink-2); max-width:56ch; }
-  .hp { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-  .subscribe-ask, .business-ask { border-top:1px solid var(--line); margin-top:24px; padding-top:20px; }
-  .subscribe-form { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
-  .subscribe-form input[type="email"] { height:44px; min-width:0; flex:1 1 240px; padding:0 14px; border:1px solid var(--line); border-radius:4px; background:var(--paper-2); color:var(--ink); font:15px/1 var(--sans); }
-  .subscribe-form input[type="email"]::placeholder { color:var(--muted); }
-  .subscribe-form .btn { flex:none; }
-  #subscribe-thanks { color:var(--ok); font-weight:600; }
-  #subscribe-error { color:var(--accent); font-weight:600; }
-  .subscribe-privacy { flex-basis:100%; margin:0; }
-  @media (max-width:480px) { .subscribe-form input[type="email"], .subscribe-form button { width:100%; } }
-
-  .pro-purchase { display:flex; flex-wrap:wrap; gap:24px; margin-top:28px; align-items:stretch; }
-  .pro-cta { border:1px solid var(--line); background:var(--paper-2); padding:24px; flex:1 1 280px; min-width:0; }
-  .pro-cta p { margin:0 0 16px; color:var(--ink-2); font-size:15px; }
-  .pro-cta .btn { display:inline-block; }
-  .pro-buy { display:flex; flex-wrap:wrap; gap:10px; margin:0 0 12px; }
-  .pro-buy .btn { margin:0; text-align:center; }
-  .pro-buy .btn + .btn { margin:0; }
-  .pro-cta p.fineprint { font-size:12.5px; color:var(--muted); margin:0 0 10px; }
-  .pro-cta p.pro-bundle-link { font-size:13.5px; margin:0; }
-  .pro-price-cards { display:flex; flex-direction:column; gap:14px; }
-  .pro-price { border:1px solid var(--line); background:var(--paper-2); padding:22px; }
-  .pro-price-amount { font:400 30px/1 var(--serif); margin:0 0 14px; }
-  .pro-price-amount span { font:13px/1 var(--sans); color:var(--muted); }
-  .pro-price .btn { display:block; text-align:center; margin:0; }
-  .pro-licence-box { border:1px solid var(--line); background:var(--paper); padding:20px 22px; display:flex; flex-direction:column; gap:16px; min-width:0; flex:1 1 320px; }
-  .status-pill { display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:4px; border:1px solid var(--line); background:var(--paper); color:var(--ink-2); font:11.5px/1 var(--mono); }
+  /* ── cenové plány a licencia ───────────────────────────────────────── */
+  .pro-purchase { display:grid; grid-template-columns:1.15fr 1fr; gap:var(--gap); margin-top:26px; align-items:start; }
+  @media (max-width:820px) { .pro-purchase { grid-template-columns:minmax(0,1fr); } }
+  .plans { margin-top:20px; }
+  .plan .btn { width:100%; justify-content:center; margin-top:14px; }
+  .plan h3 { margin-bottom:2px; }
+  .plan p { margin:0; }
+  .pro-note { margin:16px 0 0; }
+  .pro-bundle-link { margin:10px 0 0; font-family:var(--ui); font-size:14px; }
+  .pro-licence-box { border:1px solid var(--line); border-radius:var(--radius); background:var(--card); padding:20px 22px;
+    display:flex; flex-direction:column; gap:16px; min-width:0; box-shadow:0 2px 6px rgba(20,20,19,.04); }
+  .status-pill { display:inline-flex; align-items:center; gap:6px; padding:4px 9px; border-radius:6px;
+    border:1px solid var(--line); background:var(--paper); color:var(--body); font:11.5px/1.2 var(--mono); }
   .status-pill.fail { color:var(--accent); border-color:var(--accent); background:var(--accent-soft); }
   .status-pill.pass { color:var(--ok); border-color:var(--ok); }
-  .pro-licence-status { display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:13.5px; color:var(--ink-2); }
+  .pro-licence-status { display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:14px; color:var(--body); }
   .pro-licence-actions { display:flex; gap:8px; flex-wrap:wrap; }
   .pro-licence-manual { border-top:1px solid var(--line); padding-top:14px; }
-  .pro-licence-manual label { font-size:12px; color:var(--muted); display:block; margin-bottom:8px; }
+  .pro-licence-manual label { font:12px/1.4 var(--ui); color:var(--muted); display:block; margin-bottom:8px; }
   .pro-licence-manual-row { display:flex; gap:8px; flex-wrap:wrap; }
-  .pro-licence-manual-row input { flex:1 1 220px; min-width:0; background:var(--paper-2); border:1px solid var(--line); border-radius:4px; padding:9px 10px; font:12.5px/1.4 var(--mono); color:var(--ink); }
+  .pro-licence-manual-row input { flex:1 1 200px; min-width:0; background:var(--paper); border:1px solid var(--line);
+    border-radius:9px; padding:10px; font:12.5px/1.4 var(--mono); color:var(--ink); }
   .pro-licence-manual-row input:focus { border-color:var(--accent); outline:none; }
-  .pro-licence-error { color:var(--accent); font-size:12px; margin:8px 0 0; }
+  .pro-licence-error { color:var(--accent); font-size:12.5px; margin:8px 0 0; }
   .pro-licence-error:empty { display:none; }
 
+  /* ── tmavý pás na konci: odber a firmy ─────────────────────────────── */
+  .ask p { max-width:44em; }
+  .hp { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+  .subscribe-form { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:16px; }
+  .subscribe-form input[type="email"] { height:46px; min-width:0; flex:1 1 200px; padding:0 14px; border-radius:12px;
+    border:1px solid #3d3a34; background:#232220; color:#f0eee6; font:15px/1 var(--ui); }
+  .subscribe-form input[type="email"]::placeholder { color:#8f887b; }
+  .subscribe-form input[type="email"]:focus { outline:none; border-color:var(--accent-light); }
+  .subscribe-form .btn { flex:none; }
+  #subscribe-thanks { color:#9ec6a4; font-weight:600; margin-top:12px; }
+  #subscribe-error { color:var(--accent-light); font-weight:600; margin-top:12px; }
+  .subscribe-privacy { margin:12px 0 0; }
+  @media (max-width:480px) { .subscribe-form input[type="email"], .subscribe-form button { width:100%; } }
+  .band .btn-line { border-color:#e9e4d8; color:#fffdf8; }
+  .band .btn-line:hover { background:#fffdf8; color:var(--ink); }
+  .band .fineprint { color:#a8a294; }
+  .band .business-ask .btn { margin-top:16px; }
+
+  /* ── otázky ────────────────────────────────────────────────────────── */
   details { border-top:1px solid var(--line); padding:14px 0; }
   details:last-of-type { border-bottom:1px solid var(--line); }
-  summary { cursor:pointer; font:400 18px/1.3 var(--serif); list-style:none; display:flex; justify-content:space-between; gap:12px; }
+  summary { cursor:pointer; font:600 clamp(17px,1.4vw,20px)/1.35 var(--display); color:var(--ink);
+    letter-spacing:-.01em; list-style:none; display:flex; justify-content:space-between; gap:12px; }
   summary::-webkit-details-marker { display:none; }
-  summary::after { content:"+"; color:var(--accent); flex:none; font-family:var(--sans); }
+  summary::after { content:"+"; color:var(--accent); flex:none; font-family:var(--ui); font-weight:400; }
   details[open] summary::after { content:"\2013"; }
-  details p { color:var(--ink-2); margin:10px 0 0; max-width:70ch; overflow-wrap:anywhere; }
+  details p { margin:10px 0 0; overflow-wrap:anywhere; }
 
-  footer { padding:32px 0 56px; color:var(--muted); font-size:14px; }
-  footer .cols { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px 32px; }
+  /* ── pätička ───────────────────────────────────────────────────────── */
+  footer .cols { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr)); gap:20px 32px; }
   footer b { color:var(--ink); font-weight:600; }
-  footer a { color:var(--ink-2); }
-  .footer-note { margin-top:14px; font-size:12px; color:var(--muted); }
-  .footer-en { margin-top:18px; padding-top:18px; border-top:1px solid var(--line); font-size:12.5px; color:var(--muted); line-height:1.6; max-width:72ch; }
+  footer .index { margin-top:8px; max-width:24em; }
+  footer .index a { font-size:14px; padding:5px 0; }
+  .footer-note { margin-top:16px; font-size:12.5px; color:var(--muted); }
+  .footer-en { margin-top:18px; padding-top:18px; border-top:1px solid var(--line); font-size:12.5px;
+    color:var(--muted); line-height:1.6; max-width:72ch; }
   .footer-en b { color:var(--muted); }
+  @media (max-width:760px) { footer { padding-bottom:150px; } }
 
-  @media (max-width:480px) {
-    .hero { padding:44px 0 32px; }
-    nav.main a { margin-left:12px; }
-    .wordmark-sub { display:none; }
-    .btn + .btn { margin-left:0; margin-top:10px; }
-  }
-
-  /* Sticky mobile Pro bar (Paper Sell): mobile only, appears after the hero, closable. */
-  .sticky-cta { position:fixed; left:0; right:0; bottom:0; z-index:30; background:var(--paper-2); border-top:1px solid var(--line); }
-  .sticky-cta-inner { display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px; max-width:1040px; margin:0 auto; padding:10px 14px; }
-  .sticky-cta-text { flex:1 1 160px; min-width:0; font-size:12.5px; color:var(--ink-2); overflow-wrap:anywhere; }
+  /* ── pripnutý pás na mobile: Pro, dá sa zavrieť ────────────────────── */
+  .sticky-cta { position:fixed; left:0; right:0; bottom:0; z-index:30; background:var(--card);
+    border-top:1px solid var(--line); box-shadow:0 -6px 20px rgba(20,20,19,.08); }
+  .sticky-cta-inner { display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px; max-width:1040px;
+    margin:0 auto; padding:10px 14px; }
+  .sticky-cta-text { flex:1 1 160px; min-width:0; font:12.5px/1.45 var(--ui); color:var(--body); overflow-wrap:anywhere; }
   .sticky-cta-buttons { display:flex; flex-wrap:wrap; gap:8px; flex:none; }
-  .sticky-cta .btn { flex:none; padding:10px 14px; font-size:13.5px; margin:0; white-space:nowrap; }
-  .sticky-cta .btn + .btn { margin:0; }
+  .sticky-cta .btn { flex:none; height:40px; padding:0 14px; font-size:13.5px; white-space:nowrap; }
   @media (max-width:520px) {
     .sticky-cta-text { flex:1 1 calc(100% - 40px); }
     .sticky-cta-close { order:1; }
     .sticky-cta-buttons { order:2; flex:1 1 100%; }
-    .sticky-cta-buttons .btn { flex:1 1 auto; text-align:center; }
+    .sticky-cta-buttons .btn { flex:1 1 auto; justify-content:center; }
   }
-  .sticky-cta-close { flex:none; width:30px; height:30px; border:1px solid var(--line); background:var(--paper); color:var(--ink-2); border-radius:4px; cursor:pointer; font:16px/1 var(--sans); padding:0; }
+  .sticky-cta-close { flex:none; width:30px; height:30px; border:1px solid var(--line); background:var(--paper);
+    color:var(--body); border-radius:8px; cursor:pointer; font:16px/1 var(--ui); padding:0; }
   .sticky-cta-close:hover { border-color:var(--accent); color:var(--accent); }
   @media (min-width:761px) { .sticky-cta { display:none !important; } }
   @media print { .sticky-cta { display:none !important; } }
 </style>
 </head>
 <body>
+<div class="wash" aria-hidden="true"><i></i><i></i></div>
 
 <a class="skip" href="#playground">Skočiť na párovanie</a>
 <header class="top">
-  <div class="wrap">
-    <div class="brand">
-      <a class="wordmark" href="https://arling.sk/parovac-platieb/">Párovač platieb</a>
-      <a class="wordmark-sub" href="https://arling.sk/">nástroj ARLing</a>
+  <div class="wrap bar">
+    <div class="brandwrap">
+      <a class="brand" href="https://arling.sk/">
+        <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><defs><path id="m" fill-rule="evenodd" d="M16 2.5 L29 29.5 H3 Z M16 12.4 L22.4 25.6 H9.6 Z"/><clipPath id="mr"><rect x="16" width="16" height="32"/></clipPath></defs><use href="#m" fill="#141413"/><use href="#m" fill="#b23a1d" clip-path="url(#mr)"/></svg>
+        <b>ARLing</b>
+      </a>
+      <a class="part" href="https://arling.sk/parovac-platieb/">Párovač platieb</a>
     </div>
-    <nav class="main" aria-label="Stránka">
-      <a href="#problem">Ako to funguje</a>
-      <a href="#playground">Párovanie</a>
-      <a href="#endpoint">API</a>
-      <a href="#pro">Pro</a>
-      <a href="#faq">Otázky</a>
+    <nav aria-label="Stránka">
+      <a href="#problem" data-umami-event="nav-parovac" data-umami-event-part="problem">Ako to funguje</a>
+      <a href="#playground" data-umami-event="nav-parovac" data-umami-event-part="playground">Párovanie</a>
+      <a href="#endpoint" data-umami-event="nav-parovac" data-umami-event-part="endpoint">API</a>
+      <a href="#pro" data-umami-event="nav-parovac" data-umami-event-part="pro">Pro</a>
+      <a href="#faq" data-umami-event="nav-parovac" data-umami-event-part="faq">Otázky</a>
     </nav>
   </div>
 </header>
 
 <main>
-  <div class="hero">
-    <div class="wrap">
-      <h1>Výpis z banky a zoznam faktúr. Za sekundu viete, kto nezaplatil.</h1>
-      <p class="lead">Nahrajte camt.053 výpis (alebo jeho CSV) a vložte zoznam vydaných faktúr. Nástroj ich spáruje podľa variabilného symbolu a sumy, ponúkne návrhy zhôd aj bez VS a ukáže, čo je po splatnosti.</p>
-      <a class="btn btn-solid" href="#playground">Spárovať</a><a class="btn btn-line" href="https://github.com/AndryRoby/parovac-platieb" target="_blank" rel="noopener">Zdrojový kód na GitHube</a>
-      <ul class="facts">
+  <div class="wrap hero" id="hero">
+    <div>
+      <h1 id="h1"><span class="l">Výpis z banky</span>
+        <span class="l">a zoznam faktúr.</span>
+        <span class="l">Za sekundu viete,</span>
+        <span class="l">kto nezaplatil.</span></h1>
+      <p class="lead r d2">Nahrajte camt.053 výpis (alebo jeho CSV) a vložte zoznam vydaných faktúr. Nástroj ich spáruje podľa variabilného symbolu a sumy, ponúkne návrhy zhôd aj bez VS a ukáže, čo je po splatnosti.</p>
+      <div class="cta r d3">
+        <a class="btn btn-solid" href="#playground" data-umami-event="open-parovanie" data-umami-event-place="hero">Spárovať</a>
+        <a class="btn btn-line" href="https://github.com/AndryRoby/parovac-platieb" target="_blank" rel="noopener" data-umami-event="github_click" data-umami-event-place="hero">Zdrojový kód na GitHube</a>
+      </div>
+      <nav class="index r d4" aria-label="Obsah">
+        <a href="#problem" data-umami-event="index-parovac" data-umami-event-part="problem"><span class="n">01</span><span class="t">Ako to funguje</span><span class="dots"></span><span class="c">tri veci, ktoré zaberú čas</span></a>
+        <a href="#playground" data-umami-event="index-parovac" data-umami-event-part="playground"><span class="n">02</span><span class="t">Párovanie</span><span class="dots"></span><span class="c">faktúry a výpis</span></a>
+        <a href="#endpoint" data-umami-event="index-parovac" data-umami-event-part="endpoint"><span class="n">03</span><span class="t">API</span><span class="dots"></span><span class="c">parovac.js, 0 závislostí</span></a>
+        <a href="#pro" data-umami-event="index-parovac" data-umami-event-part="pro"><span class="n">04</span><span class="t">Pro</span><span class="dots"></span><span class="c">9 € mesačne alebo 79 € ročne</span></a>
+        <a href="#faq" data-umami-event="index-parovac" data-umami-event-part="faq"><span class="n">05</span><span class="t">Otázky</span><span class="dots"></span><span class="c">6 odpovedí</span></a>
+      </nav>
+      <ul class="proof facts r d5">
         <li><b>4</b> banky: Tatra banka, SLSP, VÚB, ČSOB</li>
         <li><b>6</b> formátov faktúr: Pohoda, Omega, Money S3, SuperFaktúra, iDoklad, Fakturoid</li>
         <li><b>155</b> automatizované testy</li>
@@ -395,23 +426,34 @@
         <li>beží vo vašom prehliadači</li>
       </ul>
     </div>
+    <div class="r d3">
+      <div class="shot">
+        <div class="chrome"><i></i><i></i><i></i></div>
+        <!-- Jediný obrázok na stránke, na desktope je nad ohybom, teda je to LCP prvok.
+             Preto bez loading="lazy" a s fetchpriority="high": lazy by ho odsunulo na koniec fronty.
+             Ostatné obrázky (keby pribudli) ostanu lazy podľa paper-v2 §9 bod 8. -->
+        <img src="/press/parovac-platieb-2-results.webp" width="1230" height="631" fetchpriority="high" decoding="async"
+             alt="Výsledok párovania v nástroji Párovač platieb: štyri spárované faktúry, jeden preplatok, jedna faktúra po splatnosti a jedna nespárovaná platba.">
+      </div>
+    </div>
   </div>
 
-  <section id="problem">
+  <section id="problem" class="deep">
     <div class="wrap">
-      <p class="kicker">01</p>
-      <h2>Tri veci, ktoré pri ručnom párovaní najčastejšie zaberú čas alebo sa pokazia.</h2>
-      <p class="sub">Porovnávať výpis z banky s tabuľkou faktúr riadok po riadku sa dá, ale pri väčšom počte faktúr je to pomalé a chybové.</p>
+      <p class="kicker r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 17a8.5 8.5 0 1 1 15 0"/><path d="M12 13.5l3.5-3.2"/><circle cx="12" cy="14.5" r="1"/></svg>01</p>
+      <h2 class="r d1">Tri veci, ktoré pri ručnom párovaní najčastejšie zaberú čas alebo sa pokazia.</h2>
+      <div class="rule"></div>
+      <p class="sub r d2">Porovnávať výpis z banky s tabuľkou faktúr riadok po riadku sa dá, ale pri väčšom počte faktúr je to pomalé a chybové.</p>
       <ol class="rules">
-        <li>
+        <li class="r d2">
           <b>Ručné párovanie trvá hodiny.</b>
           <p>Prezerať výpis riadok po riadku a hľadať, ktorá platba patrí ku ktorej faktúre, je pri desiatkach faktúr mesačne rutina na celé poobedie, ktorú ľahko niečo prekĺzne.</p>
         </li>
-        <li>
+        <li class="r d3">
           <b>Variabilné symboly sa píšu zle.</b>
           <p>Klient prehodí číslicu, vynechá úvodnú nulu alebo VS vôbec nevyplní. Bez zhodného VS sa platba dnes často len stratí v kôpke „treba dohľadať“.</p>
         </li>
-        <li>
+        <li class="r d4">
           <b>Preplatky a splátky sa strácajú.</b>
           <p>Keď klient zaplatí inú sumu, alebo faktúru rozdelí na dve platby, ručné párovanie to ľahko označí ako nezaplatené, hoci uhradené je.</p>
         </li>
@@ -421,11 +463,12 @@
 
   <section id="playground">
     <div class="wrap">
-      <p class="kicker">02</p>
-      <h2>Vložte faktúry, nahrajte výpis. Dostanete štyri zoznamy.</h2>
-      <p class="sub">Nič z toho, čo vložíte alebo nahráte, sa neodosiela. Párovanie beží vo vašom prehliadači.</p>
+      <p class="kicker r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M9 10v9M15 10v9"/></svg>02</p>
+      <h2 class="r d1">Vložte faktúry, nahrajte výpis. Dostanete štyri zoznamy.</h2>
+      <div class="rule"></div>
+      <p class="sub r d2">Nič z toho, čo vložíte alebo nahráte, sa neodosiela. Párovanie beží vo vašom prehliadači.</p>
 
-      <div class="play">
+      <div class="play r d3">
         <div class="play-body">
           <div class="pane" id="invoice-pane">
             <div class="pane-head">
@@ -537,14 +580,15 @@
     </div>
   </section>
 
-  <section id="endpoint">
+  <section id="endpoint" class="deep">
     <div class="wrap">
-      <p class="kicker">03</p>
-      <h2>Štyri funkcie. Faktúry a výpis dnu, štyri zoznamy von.</h2>
-      <p class="sub">Žiadny server, žiadny API kľúč, žiadna registrácia. <code>parovac.js</code> je čistý JavaScript bez závislostí: prečítajte si ho, forknite, alebo ho spustite vo vlastnom kóde či CI.</p>
+      <p class="kicker r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M9 8V5.5M15 8V5.5M4 13h2M18 13h2"/></svg>03</p>
+      <h2 class="r d1">Štyri funkcie. Faktúry a výpis dnu, štyri zoznamy von.</h2>
+      <div class="rule"></div>
+      <p class="sub r d2">Žiadny server, žiadny API kľúč, žiadna registrácia. <code>parovac.js</code> je čistý JavaScript bez závislostí: prečítajte si ho, forknite, alebo ho spustite vo vlastnom kóde či CI.</p>
 
       <div class="endpoint">
-        <div class="codeblock">
+        <div class="codeblock r d2">
           <div class="codeblock-head">
             <span>parovac.js</span>
             <span>0 závislostí</span>
@@ -568,7 +612,7 @@ const rep = report(result);
 const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
         </div>
 
-        <div class="endpoint-copy">
+        <div class="endpoint-copy r d3">
           <p>Parsovanie výpisu, parsovanie faktúr aj samotné párovanie beží presne tak, ako ho volá formulár vyššie, vo vašom prehliadači. Neexistuje backend ani API kľúč, ktorý by obsah výpisu alebo faktúr odniesol inam.</p>
           <p>Párovanie: variabilný symbol a suma zhodná v rámci tolerancie sa berie ako zhoda; rovnaký VS s inou sumou ako čiastočná platba alebo preplatok; bez zhodného VS sa skúša jedinečná zhoda podľa sumy a blízkosti dátumu k splatnosti a označí sa ako návrh; zvyšok ostáva nespárovaný. Platby s rovnakým VS sa pred párovaním sčítajú (splátky).</p>
           <p class="fineprint">Šablóny hlavičiek pre Pohodu, Omegu, Money S3, SuperFaktúru, iDoklad a Fakturoid sú odhad tejto stránky na základe bežných exportov, nie overená špecifikácia od výrobcov. Prípad, ktorý nástroj vyhodnotí zle, nahláste ako <a href="https://github.com/AndryRoby/parovac-platieb/issues" target="_blank" rel="noopener">issue na GitHube</a>.</p>
@@ -579,36 +623,46 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
 
   <section id="pro">
     <div class="wrap">
-      <p class="kicker">04</p>
-      <h2>Pro pre účtovníka, ktorý to robí každý mesiac.</h2>
-      <p class="sub">Bezplatná verzia ostáva bez limitu na počet riadkov navždy. Pro je pohodlie pri opakovanom mesačnom spracovaní viacerých účtov, nie odomknutá funkčnosť párovania.</p>
+      <p class="kicker r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="12" r="3.5"/><path d="M11.5 12H21M18 12v3M15 12v2.2"/></svg>04</p>
+      <h2 class="r d1">Pro pre účtovníka, ktorý to robí každý mesiac.</h2>
+      <div class="rule"></div>
+      <p class="sub r d2">Bezplatná verzia ostáva bez limitu na počet riadkov navždy. Pro je pohodlie pri opakovanom mesačnom spracovaní viacerých účtov, nie odomknutá funkčnosť párovania.</p>
 
       <ol class="rules">
-        <li>
+        <li class="r d2">
           <b>Viac výpisov a účtov naraz.</b>
           <p>Pridajte ďalšie výpisy (napríklad z viacerých bankových účtov) a spárujte ich proti tomu istému zoznamu faktúr v jednom kroku.</p>
         </li>
-        <li>
+        <li class="r d3">
           <b>Uložené mapovanie stĺpcov.</b>
           <p>Mapovanie stĺpcov pre pravidelný mesačný export z vášho účtovného programu sa uloží a nabudúce sa už len vyberie.</p>
         </li>
-        <li>
+        <li class="r d4">
           <b>Export pre Pohodu, Omegu alebo Money S3.</b>
           <p>Zoznam spárovaných faktúr na označenie ako uhradené vo formáte pripravenom pre váš program, nie len všeobecný CSV.</p>
         </li>
       </ol>
 
       <div class="pro-purchase">
-        <div class="pro-cta">
+        <div class="r d2">
           <p><b>Jedna licencia pre štyri nástroje.</b> Pro pre Párovač platieb sa aktivuje rovnakou licenciou ako SEPA pain.001 Doctor, SEPA pain.001 Generátor a camt.053 do Excelu: 9&nbsp;€ mesačne alebo 79&nbsp;€ ročne pre všetky štyri nástroje, DPH v cene, faktúru pošle Stripe.</p>
-          <div class="pro-buy">
-            <a class="btn btn-solid" id="pro-buy-yearly-btn" href="https://buy.stripe.com/cNi9ANcYi19FaoW09D4ko02" data-umami-event="buy_click" data-umami-event-plan="year" data-umami-event-place="parovac" data-umami-event-spot="pro">Kúpiť Pro, 79&nbsp;€/rok</a>
-            <a class="btn btn-line" id="pro-buy-monthly-btn" href="https://buy.stripe.com/5kQ4gt2jE7y354Cg8B4ko01" data-umami-event="buy_click" data-umami-event-plan="month" data-umami-event-place="parovac" data-umami-event-spot="pro">alebo 9&nbsp;€/mesiac</a>
+          <div class="plans">
+            <div class="card plan pick">
+              <span class="pill">odporúčame</span>
+              <h3>Ročne</h3>
+              <p class="price">79&nbsp;€ <small>/ rok</small></p>
+              <a class="btn btn-solid" id="pro-buy-yearly-btn" href="https://buy.stripe.com/cNi9ANcYi19FaoW09D4ko02" data-umami-event="buy_click" data-umami-event-plan="year" data-umami-event-place="parovac" data-umami-event-spot="pro">Kúpiť Pro, 79&nbsp;€/rok</a>
+            </div>
+            <div class="card plan">
+              <h3>Mesačne</h3>
+              <p class="price">9&nbsp;€ <small>/ mesiac</small></p>
+              <a class="btn btn-line" id="pro-buy-monthly-btn" href="https://buy.stripe.com/5kQ4gt2jE7y354Cg8B4ko01" data-umami-event="buy_click" data-umami-event-plan="month" data-umami-event-place="parovac" data-umami-event-spot="pro">alebo 9&nbsp;€/mesiac</a>
+            </div>
           </div>
-          <p class="fineprint">Platba cez Stripe, DPH v cene, zrušiť môžete kedykoľvek. Licenčný kľúč dostanete hneď po zaplatení na potvrdzovacej stránke.</p>
+          <p class="fineprint pro-note">Platba cez Stripe, DPH v cene, zrušiť môžete kedykoľvek. Licenčný kľúč dostanete hneď po zaplatení na potvrdzovacej stránke.</p>
           <p class="pro-bundle-link"><a id="pro-bundle-link" href="https://arling.sk/bankove-nastroje/" data-umami-event="bundle_click" data-umami-event-place="parovac">Čo všetko je v balíku</a></p>
         </div>
-        <div class="pro-licence-box">
+        <div class="pro-licence-box r d3">
           <div class="pro-licence-status">
             <span class="status-pill" id="pro-licence-pill">bez licencie</span>
             <span id="pro-licence-detail"></span>
@@ -626,67 +680,98 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
           </div>
         </div>
       </div>
+    </div>
+  </section>
 
-      <div class="ask subscribe-ask" id="subscribe">
-        <p><b>Dajte mi vedieť o novom nástroji.</b> Len nové nástroje. Žiadny newsletter, žiadne zdieľanie. Odhlásenie odpoveďou na mail.</p>
-        <form id="subscribe-form" class="subscribe-form" data-subscribe data-source="parovac-platieb" data-lang="sk" data-thanks="subscribe-thanks" data-error="subscribe-error" novalidate>
-          <div class="hp" aria-hidden="true"><input type="text" name="website" id="subscribe-website" tabindex="-1" autocomplete="off"></div>
-          <input type="email" id="subscribe-email" name="email" required autocomplete="email" inputmode="email" placeholder="vas@email.sk" aria-label="E-mailová adresa">
-          <button class="btn btn-solid" type="submit">Dať vedieť</button>
-        </form>
-        <p id="subscribe-thanks" hidden>Ďakujeme. Ozveme sa len vtedy, keď bude niečo nové.</p>
-        <p id="subscribe-error" hidden>Nepodarilo sa uložiť. Napíšte na <a href="mailto:andrej@arling.sk">andrej@arling.sk</a>.</p>
-        <p class="fineprint subscribe-privacy"><a href="https://arling.sk/privacy/">Súkromie</a></p>
-      </div>
-      <div class="ask business-ask" id="business">
-        <p><b>Potrebujete to pre firmu?</b> Hromadné spracovanie viacerých firiem, API, podpora. Napíšte, čo potrebujete, a odpovieme do 24 hodín.</p>
-        <a class="btn btn-line" href="mailto:andrej@arling.sk?subject=Parovac%20platieb%20pre%20firmu" data-umami-event="business_interest">Napísať, čo potrebujem</a>
+  <section id="faq" class="deep">
+    <div class="wrap">
+      <p class="kicker r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.3l2.4 2.4 4.6-4.9"/></svg>05</p>
+      <h2 class="r d1">Otázky, ktoré ľudia naozaj hľadajú.</h2>
+      <div class="rule"></div>
+      <p class="sub r d2">Priame odpovede na otázky o párovaní výpisu z banky s faktúrami.</p>
+
+      <div class="r d3">
+        <details>
+          <summary>Aké súbory potrebujem?</summary>
+          <p>Výpis z banky ako <code>camt.053</code> XML (predvolený export do účtovníctva v Tatra banke, SLSP, VÚB aj ČSOB), alebo jeho CSV export zo sesterského nástroja <a href="https://arling.sk/camt053-to-excel/">camt.053 do Excelu</a>. A zoznam vydaných faktúr: text skopírovaný z Excelu, alebo nahraný CSV/TSV súbor, ideálne s hlavičkou (číslo faktúry, VS, suma, splatnosť, odberateľ). Export z Pohody, Omegy, Money S3, SuperFaktúry, iDokladu aj Fakturoidu funguje, stĺpce sa rozpoznávajú podľa hlavičky, prípadne sa dajú prepísať ručne.</p>
+        </details>
+        <details>
+          <summary>Ako sa páruje bez VS?</summary>
+          <p>Keď platba nemá zhodný variabilný symbol so žiadnou faktúrou, nástroj skúsi nájsť faktúru s rovnakou sumou (v rámci tolerancie), ktorej splatnosť je od dátumu platby najviac 45 dní (v Pro nastaviteľné). Ak je taká zhoda jediná možná, teda nie je viacznačná medzi viacerými faktúrami ani platbami, ponúkne sa ako <b>návrh</b> na spárovanie.</p>
+        </details>
+        <details>
+          <summary>Čo sú návrhy?</summary>
+          <p>Návrh je párovanie podľa sumy a blízkosti dátumu bez zhodného VS: menej isté ako zhoda cez variabilný symbol, preto ho nástroj neoznačí automaticky za uhradené. Zobrazí sa v zozname Spárované s označením „návrh“ a čaká na ručné potvrdenie, napríklad keď klient VS pri platbe napísal zle.</p>
+        </details>
+        <details>
+          <summary>Odosielajú sa dáta?</summary>
+          <p>Nie. Parsovanie výpisu aj faktúr a samotné párovanie beží celé vo vašom prehliadači, nástroj nemá backend. Jedinou sieťovou aktivitou je načítanie statických súborov stránky, anonymné počítadlo použitia (Umami: len názvy udalostí a počty, nikdy obsah výpisu ani faktúr) a e-mail, ak sa dobrovoľne prihlásite na odber noviniek nižšie.</p>
+        </details>
+        <details>
+          <summary>Ako označím uhradené vo svojom programe?</summary>
+          <p>Zoznam Spárované sa dá stiahnuť ako CSV „označiť uhradené“ (číslo faktúry, dátum úhrady, suma) na spätný import do vášho účtovného programu. Free verzia stiahne všeobecný CSV, Pro pridáva stĺpcový formát v jazyku Pohody, Omegy alebo Money S3. Ani jeden nie je overený formát importu priamo od výrobcu, len odhad tejto stránky, takže ho pred importom skontrolujte.</p>
+        </details>
+        <details>
+          <summary>Čo je v Pro?</summary>
+          <p>9 €/mesiac alebo 79 €/rok pridáva viac výpisov a účtov naraz, uložené mapovanie stĺpcov, nastaviteľné tolerancie uložené ako predvoľba, export pripravený pre Pohodu, Omegu alebo Money S3, a históriu predchádzajúcich párovaní. Samotné párovanie zostáva zadarmo, bez limitu na počet riadkov. Pozrite si <a href="#pro">sekciu Pro</a>.</p>
+        </details>
       </div>
     </div>
   </section>
 
-  <section id="faq">
+  <section class="band" id="ozvite-sa">
     <div class="wrap">
-      <p class="kicker">05</p>
-      <h2>Otázky, ktoré ľudia naozaj hľadajú.</h2>
-      <p class="sub">Priame odpovede na otázky o párovaní výpisu z banky s faktúrami.</p>
-
-      <details>
-        <summary>Aké súbory potrebujem?</summary>
-        <p>Výpis z banky ako <code>camt.053</code> XML (predvolený export do účtovníctva v Tatra banke, SLSP, VÚB aj ČSOB), alebo jeho CSV export zo sesterského nástroja <a href="https://arling.sk/camt053-to-excel/">camt.053 do Excelu</a>. A zoznam vydaných faktúr: text skopírovaný z Excelu, alebo nahraný CSV/TSV súbor, ideálne s hlavičkou (číslo faktúry, VS, suma, splatnosť, odberateľ). Export z Pohody, Omegy, Money S3, SuperFaktúry, iDokladu aj Fakturoidu funguje, stĺpce sa rozpoznávajú podľa hlavičky, prípadne sa dajú prepísať ručne.</p>
-      </details>
-      <details>
-        <summary>Ako sa páruje bez VS?</summary>
-        <p>Keď platba nemá zhodný variabilný symbol so žiadnou faktúrou, nástroj skúsi nájsť faktúru s rovnakou sumou (v rámci tolerancie), ktorej splatnosť je od dátumu platby najviac 45 dní (v Pro nastaviteľné). Ak je taká zhoda jediná možná, teda nie je viacznačná medzi viacerými faktúrami ani platbami, ponúkne sa ako <b>návrh</b> na spárovanie.</p>
-      </details>
-      <details>
-        <summary>Čo sú návrhy?</summary>
-        <p>Návrh je párovanie podľa sumy a blízkosti dátumu bez zhodného VS: menej isté ako zhoda cez variabilný symbol, preto ho nástroj neoznačí automaticky za uhradené. Zobrazí sa v zozname Spárované s označením „návrh“ a čaká na ručné potvrdenie, napríklad keď klient VS pri platbe napísal zle.</p>
-      </details>
-      <details>
-        <summary>Odosielajú sa dáta?</summary>
-        <p>Nie. Parsovanie výpisu aj faktúr a samotné párovanie beží celé vo vašom prehliadači, nástroj nemá backend. Jedinou sieťovou aktivitou je načítanie statických súborov stránky, anonymné počítadlo použitia (Umami: len názvy udalostí a počty, nikdy obsah výpisu ani faktúr) a e-mail, ak sa dobrovoľne prihlásite na odber noviniek nižšie.</p>
-      </details>
-      <details>
-        <summary>Ako označím uhradené vo svojom programe?</summary>
-        <p>Zoznam Spárované sa dá stiahnuť ako CSV „označiť uhradené“ (číslo faktúry, dátum úhrady, suma) na spätný import do vášho účtovného programu. Free verzia stiahne všeobecný CSV, Pro pridáva stĺpcový formát v jazyku Pohody, Omegy alebo Money S3. Ani jeden nie je overený formát importu priamo od výrobcu, len odhad tejto stránky, takže ho pred importom skontrolujte.</p>
-      </details>
-      <details>
-        <summary>Čo je v Pro?</summary>
-        <p>9 €/mesiac alebo 79 €/rok pridáva viac výpisov a účtov naraz, uložené mapovanie stĺpcov, nastaviteľné tolerancie uložené ako predvoľba, export pripravený pre Pohodu, Omegu alebo Money S3, a históriu predchádzajúcich párovaní. Samotné párovanie zostáva zadarmo, bez limitu na počet riadkov. Pozrite si <a href="#pro">sekciu Pro</a>.</p>
-      </details>
+      <div class="cols">
+        <div class="ask subscribe-ask r" id="subscribe">
+          <h3>Dajte mi vedieť o novom nástroji.</h3>
+          <p>Len nové nástroje. Žiadny newsletter, žiadne zdieľanie. Odhlásenie odpoveďou na mail.</p>
+          <form id="subscribe-form" class="subscribe-form" data-subscribe data-source="parovac-platieb" data-lang="sk" data-thanks="subscribe-thanks" data-error="subscribe-error" novalidate>
+            <div class="hp" aria-hidden="true"><input type="text" name="website" id="subscribe-website" tabindex="-1" autocomplete="off"></div>
+            <input type="email" id="subscribe-email" name="email" required autocomplete="email" inputmode="email" placeholder="vas@email.sk" aria-label="E-mailová adresa">
+            <button class="btn btn-solid" type="submit" data-umami-event="subscribe_submit" data-umami-event-place="parovac">Dať vedieť</button>
+          </form>
+          <p id="subscribe-thanks" hidden>Ďakujeme. Ozveme sa len vtedy, keď bude niečo nové.</p>
+          <p id="subscribe-error" hidden>Nepodarilo sa uložiť. Napíšte na <a href="mailto:andrej@arling.sk">andrej@arling.sk</a>.</p>
+          <p class="fineprint subscribe-privacy"><a href="https://arling.sk/privacy/">Súkromie</a></p>
+        </div>
+        <div class="ask business-ask r d2" id="business">
+          <h3>Potrebujete to pre firmu?</h3>
+          <p>Hromadné spracovanie viacerých firiem, API, podpora. Napíšte, čo potrebujete, a odpovieme do 24 hodín.</p>
+          <a class="btn btn-line" href="mailto:andrej@arling.sk?subject=Parovac%20platieb%20pre%20firmu" data-umami-event="business_interest">Napísať, čo potrebujem</a>
+        </div>
+      </div>
     </div>
   </section>
 </main>
 
+<nav class="rail" aria-label="Kde ste">
+  <a href="#hero" aria-label="Úvod"><i></i><span>Úvod</span></a>
+  <a href="#problem" aria-label="Prečo"><i></i><span>Prečo</span></a>
+  <a href="#playground" aria-label="Párovanie"><i></i><span>Párovanie</span></a>
+  <a href="#endpoint" aria-label="API"><i></i><span>API</span></a>
+  <a href="#pro" aria-label="Pro"><i></i><span>Pro</span></a>
+  <a href="#faq" aria-label="Otázky"><i></i><span>Otázky</span></a>
+</nav>
+
 <footer>
-  <div class="wrap cols">
-    <div><b>ARLing s. r. o.</b><br>Ivanská cesta 32E<br>821 04 Bratislava, Slovensko</div>
-    <div>IČO 56583486<br>IČ DPH SK2122352100<br><a href="mailto:andrej@arling.sk">andrej@arling.sk</a></div>
-    <div>Súvisiace nástroje: <a href="https://arling.sk/camt053-to-excel/">camt.053 do Excelu</a> · <a href="https://arling.sk/sepa-pain001-generator/">SEPA pain.001 Generátor</a> · <a href="https://arling.sk/sepa-pain001-doctor/">SEPA pain.001 Doctor</a><br><a href="https://arling.sk/">Všetky nástroje ARLing</a> · <a href="llms.txt">llms.txt</a> · <a href="https://github.com/AndryRoby/parovac-platieb" target="_blank" rel="noopener">GitHub</a> · <a href="https://arling.sk/privacy/">Súkromie</a></div>
-  </div>
-  <p class="wrap footer-note">Nič neopúšťa váš prehliadač okrem anonymných počtov použitia cez self-hosted Umami (a e-mailu, ak sa prihlásite na odber nižšie).</p>
   <div class="wrap">
+    <div class="cols">
+      <div><b>ARLing s. r. o.</b><br>Ivanská cesta 32E<br>821 04 Bratislava, Slovensko</div>
+      <div>IČO 56583486<br>IČ DPH SK2122352100<br><a href="mailto:andrej@arling.sk">andrej@arling.sk</a></div>
+      <div>
+        Súvisiace nástroje:
+        <nav class="index" aria-label="Súvisiace nástroje">
+          <a href="https://arling.sk/camt053-to-excel/" data-umami-event="index-nastroje" data-umami-event-tool="camt053-to-excel"><span class="t">camt.053 do Excelu</span><span class="dots"></span></a>
+          <a href="https://arling.sk/sepa-pain001-generator/" data-umami-event="index-nastroje" data-umami-event-tool="sepa-generator"><span class="t">SEPA pain.001 Generátor</span><span class="dots"></span></a>
+          <a href="https://arling.sk/sepa-pain001-doctor/" data-umami-event="index-nastroje" data-umami-event-tool="sepa-doctor"><span class="t">SEPA pain.001 Doctor</span><span class="dots"></span></a>
+          <a href="https://arling.sk/" data-umami-event="index-nastroje" data-umami-event-tool="hub"><span class="t">Všetky nástroje ARLing</span><span class="dots"></span></a>
+          <a href="llms.txt" data-umami-event="index-nastroje" data-umami-event-tool="llms"><span class="t">llms.txt</span><span class="dots"></span></a>
+          <a href="https://github.com/AndryRoby/parovac-platieb" target="_blank" rel="noopener" data-umami-event="index-nastroje" data-umami-event-tool="github"><span class="t">GitHub</span><span class="dots"></span></a>
+          <a href="https://arling.sk/privacy/" data-umami-event="index-nastroje" data-umami-event-tool="privacy"><span class="t">Súkromie</span><span class="dots"></span></a>
+        </nav>
+      </div>
+    </div>
+    <p class="footer-note">Nič neopúšťa váš prehliadač okrem anonymných počtov použitia cez self-hosted Umami (a e-mailu, ak sa prihlásite na odber nižšie).</p>
     <p class="footer-en" lang="en"><b>In English:</b> Párovač platieb is a free, client-side tool that matches a camt.053 bank statement (Tatra banka, Slovenská sporiteľňa, VÚB, ČSOB) against a list of issued invoices (Pohoda, Omega, Money S3, SuperFaktúra, iDoklad, Fakturoid, or a plain spreadsheet): variable symbol plus amount, a proposed match by amount and due-date proximity when no VS matches, and a summed check for invoices paid in installments. Nothing you paste or upload is sent anywhere. See <a href="llms.txt">llms.txt</a> or the <a href="https://github.com/AndryRoby/parovac-platieb" target="_blank" rel="noopener">source on GitHub</a>.</p>
   </div>
 </footer>
@@ -1064,12 +1149,13 @@ ${SAMPLE_ENTRIES.map(sampleEntry).join('\n')}
     const thead = cols.map((c) => `<th${c.amount ? ' class="num"' : ''}>${esc(c.label)}</th>`).join('');
     const tbody = rows.map((r) => '<tr>' + cols.map((c) => {
       const v = r[c.key];
-      if (c.key === 'proposal') return `<td>${v ? '<span class="badge-navrh">návrh</span>' : ''}</td>`;
-      if (c.amount) return `<td class="num">${typeof v === 'number' ? v.toFixed(2) + ' €' : ''}</td>`;
-      if (c.key === 'daysOverdue') return `<td class="num">${v === null || v === undefined ? '-' : v}</td>`;
-      return `<td>${esc(v == null ? '' : v)}</td>`;
+      const th = ` data-th="${esc(c.label)}"`; // na mobile sa tabuľka rozloží na riadky (paper.css)
+      if (c.key === 'proposal') return `<td${th}>${v ? '<span class="badge-navrh">návrh</span>' : ''}</td>`;
+      if (c.amount) return `<td class="num"${th}>${typeof v === 'number' ? v.toFixed(2) + ' €' : ''}</td>`;
+      if (c.key === 'daysOverdue') return `<td class="num"${th}>${v === null || v === undefined ? '-' : v}</td>`;
+      return `<td${th}>${esc(v == null ? '' : v)}</td>`;
     }).join('') + '</tr>').join('');
-    return `<div class="table-scroll"><table class="rtable"><thead><tr>${thead}</tr></thead><tbody>${tbody}</tbody></table></div>`;
+    return `<div class="tablewrap"><table class="rtable"><thead><tr>${thead}</tr></thead><tbody>${tbody}</tbody></table></div>`;
   }
 
   function renderTabsBar() {
@@ -1379,6 +1465,59 @@ ${SAMPLE_ENTRIES.map(sampleEntry).join('\n')}
         bar.hidden = true;
       });
     }
+  }
+})();
+</script>
+<script>
+/* Pohyb podľa ops/design/paper-v2.md, sekcia 7: príchody sekcií cez IntersectionObserver,
+   nadpis po slovách, bočný register. Žiadna knižnica, žiadny externý skript,
+   žiadny requestAnimationFrame v slučke, prefers-reduced-motion vypína všetko. */
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hero = document.getElementById('hero');
+
+  if (reduce) {
+    document.querySelectorAll('.r, section').forEach(function (e) { e.classList.add('in'); });
+  } else if (hero) {
+    requestAnimationFrame(function () {
+      hero.querySelectorAll('.r').forEach(function (e) { e.classList.add('in'); });
+    });
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  }, { rootMargin: '0px 0px -12% 0px', threshold: 0.1 });
+  document.querySelectorAll('section').forEach(function (s) { io.observe(s); });
+
+  // nadpis sa objaví po slovách, ako dobre vytlačený titulok
+  var h1 = document.getElementById('h1');
+  if (h1) {
+    var i = 0;
+    Array.prototype.forEach.call(h1.querySelectorAll('.l'), function (line) {
+      line.innerHTML = line.textContent.split(' ').map(function (w) {
+        var d = (i++ * 0.06).toFixed(2);
+        return '<span class="w" style="transition-delay:' + d + 's">' + w + '</span>';
+      }).join(' ');
+    });
+    requestAnimationFrame(function () { h1.classList.add('in'); });
+  }
+
+  // bočný register sleduje, ktorá sekcia je v strede obrazovky
+  var rail = document.querySelector('.rail');
+  if (rail) {
+    var links = Array.prototype.slice.call(rail.querySelectorAll('a'));
+    var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var railIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        var k = targets.indexOf(en.target);
+        if (k < 0 || !en.isIntersecting) return;
+        links.forEach(function (a, j) { a.setAttribute('aria-current', j === k ? 'true' : 'false'); });
+      });
+      rail.classList.add('on');
+    }, { rootMargin: '-45% 0px -45% 0px' });
+    targets.forEach(function (t) { if (t) railIo.observe(t); });
   }
 })();
 </script>
