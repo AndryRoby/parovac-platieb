@@ -4,7 +4,7 @@
 <script src="/style/vzhlad.js?v=93c2659f"></script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://homelab.tailbf8f27.ts.net 'sha256-hpLUjl2oEXNDE1wrrELVRW24WfTiMP7fe+aN/um/lfI=' 'sha256-VzXyL2ftOA76Nrb6s8GTI1/bUxiIvbudi2IteBEZOmI=' 'sha256-Ma0rkhoPigHx0GIzcVTTigNXX1MZ/Dl19TPQwa5DPeI=' 'sha256-mVKIpuKCUomHT1VbZNGtYsnRi6jHwazFTClsMISgvOc=' 'sha256-WwiC/EcH5Yzpxy9+bWeqM3GxVAIQa+k8JbOp2zZjGSU='; connect-src 'self' https://homelab.tailbf8f27.ts.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://homelab.tailbf8f27.ts.net 'sha256-hpLUjl2oEXNDE1wrrELVRW24WfTiMP7fe+aN/um/lfI=' 'sha256-X4JIiZBrF1Ixq05YXHJ6wWCMAnjOEWSMc8qqUUVmOL8=' 'sha256-VUjwbQV1+ti15F9lW1pWeEOm4fLqne2Z8N98th6eUjc=' 'sha256-mVKIpuKCUomHT1VbZNGtYsnRi6jHwazFTClsMISgvOc=' 'sha256-WwiC/EcH5Yzpxy9+bWeqM3GxVAIQa+k8JbOp2zZjGSU='; connect-src 'self' https://homelab.tailbf8f27.ts.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0a0908">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -114,7 +114,7 @@
       "name": "Ako označím uhradené vo svojom programe?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Zoznam Spárované sa dá stiahnuť ako CSV „označiť uhradené“ (číslo faktúry, dátum úhrady, suma) na spätný import. Free verzia stiahne všeobecný CSV, Pro pridáva stĺpcový formát v jazyku Pohody, Omegy alebo Money S3; ani jeden nie je overený formát importu priamo od výrobcu, len odhad tejto stránky, tak ho pred importom skontrolujte."
+        "text": "Zoznam Spárované sa dá stiahnuť ako CSV „označiť uhradené“ (číslo faktúry, dátum úhrady, suma) na spätný import. Bez licencie sa stiahne prvých 20 riadkov ako ukážka vo všeobecnom CSV. S licenciou celý súbor, a navyše stĺpcový formát v jazyku Pohody, Omegy alebo Money S3; ani jeden nie je overený formát importu priamo od výrobcu, len odhad tejto stránky, tak ho pred importom skontrolujte."
       }
     },
     {
@@ -122,7 +122,7 @@
       "name": "Čo je v Pro?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "9 EUR mesačne alebo 79 EUR ročne pridáva: viac výpisov a účtov naraz v jednej relácii, uložené mapovanie stĺpcov (netreba prepisovať pri každom importe), nastaviteľné tolerancie (dni pri návrhu, centy pri sume) uložené ako predvoľba, export pripravený pre Pohodu, Omegu alebo Money S3, a históriu predchádzajúcich párovaní. Samotné párovanie zostáva zadarmo, bez limitu na počet riadkov."
+        "text": "9 EUR mesačne alebo 79 EUR ročne pridáva: viac výpisov a účtov naraz v jednej relácii, uložené mapovanie stĺpcov (netreba prepisovať pri každom importe), nastaviteľné tolerancie (dni pri návrhu, centy pri sume) uložené ako predvoľba, export pripravený pre Pohodu, Omegu alebo Money S3, a históriu predchádzajúcich párovaní. Samotné párovanie a celé tabuľky na obrazovke zostávajú zadarmo, bez limitu na počet riadkov; bez licencie má stiahnutý súbor prvých 20 riadkov ako ukážku."
       }
     }
   ]
@@ -420,7 +420,7 @@
         <li><b>4</b> banky: Tatra banka, SLSP, VÚB, ČSOB</li>
         <li><b>6</b> formátov faktúr: Pohoda, Omega, Money S3, SuperFaktúra, iDoklad, Fakturoid</li>
         <li><b>155</b> automatizované testy</li>
-        <li><b>0 €</b>, bez limitu riadkov</li>
+        <li><b>0 €</b>, celé tabuľky na obrazovke</li>
         <li>beží vo vašom prehliadači</li>
       </ul>
     </div>
@@ -571,6 +571,7 @@
               <button class="icon-btn primary" id="markpaid-download-btn" type="button">Stiahnuť</button>
               <button class="icon-btn" id="history-btn" type="button" disabled>história</button><a class="pro-badge" href="#pro">PRO</a>
             </div>
+            <p class="hint" id="ukazka-hint">Tabuľky na obrazovke sú celé a zadarmo, bez limitu na počet riadkov. Bez licencie má stiahnutý súbor prvých 20 riadkov ako ukážku; celý súbor je súčasťou licencie.</p>
             <div class="pro-history-panel" id="history-panel" hidden></div>
           </div>
         </div>
@@ -624,7 +625,7 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
       <p class="kicker r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="12" r="3.5"/><path d="M11.5 12H21M18 12v3M15 12v2.2"/></svg>04</p>
       <h2 class="r d1">Pro pre účtovníka, ktorý to robí každý mesiac.</h2>
       <div class="rule"></div>
-      <p class="sub r d2">Bezplatná verzia ostáva bez limitu na počet riadkov navždy. Pro je pohodlie pri opakovanom mesačnom spracovaní viacerých účtov, nie odomknutá funkčnosť párovania.</p>
+      <p class="sub r d2">Bezplatná verzia ukáže celé tabuľky na obrazovke, bez limitu na počet riadkov, navždy. Stiahnutý súbor má bez licencie prvých 20 riadkov ako ukážku. Pro je pohodlie pri opakovanom mesačnom spracovaní viacerých účtov, nie odomknutá funkčnosť párovania.</p>
 
       <ol class="rules">
         <li class="r d2">
@@ -707,11 +708,11 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
         </details>
         <details>
           <summary>Ako označím uhradené vo svojom programe?</summary>
-          <p>Zoznam Spárované sa dá stiahnuť ako CSV „označiť uhradené“ (číslo faktúry, dátum úhrady, suma) na spätný import do vášho účtovného programu. Free verzia stiahne všeobecný CSV, Pro pridáva stĺpcový formát v jazyku Pohody, Omegy alebo Money S3. Ani jeden nie je overený formát importu priamo od výrobcu, len odhad tejto stránky, takže ho pred importom skontrolujte.</p>
+          <p>Zoznam Spárované sa dá stiahnuť ako CSV „označiť uhradené“ (číslo faktúry, dátum úhrady, suma) na spätný import do vášho účtovného programu. Bez licencie sa stiahne prvých 20 riadkov ako ukážka vo všeobecnom CSV. S licenciou celý súbor, a navyše stĺpcový formát v jazyku Pohody, Omegy alebo Money S3. Ani jeden nie je overený formát importu priamo od výrobcu, len odhad tejto stránky, takže ho pred importom skontrolujte.</p>
         </details>
         <details>
           <summary>Čo je v Pro?</summary>
-          <p>9 €/mesiac alebo 79 €/rok pridáva viac výpisov a účtov naraz, uložené mapovanie stĺpcov, nastaviteľné tolerancie uložené ako predvoľba, export pripravený pre Pohodu, Omegu alebo Money S3, a históriu predchádzajúcich párovaní. Samotné párovanie zostáva zadarmo, bez limitu na počet riadkov. Pozrite si <a href="#pro">sekciu Pro</a>.</p>
+          <p>9 €/mesiac alebo 79 €/rok pridáva viac výpisov a účtov naraz, uložené mapovanie stĺpcov, nastaviteľné tolerancie uložené ako predvoľba, export pripravený pre Pohodu, Omegu alebo Money S3, a históriu predchádzajúcich párovaní. Samotné párovanie a celé tabuľky na obrazovke zostávajú zadarmo, bez limitu na počet riadkov; bez licencie má stiahnutý súbor prvých 20 riadkov ako ukážku. Pozrite si <a href="#pro">sekciu Pro</a>.</p>
         </details>
       </div>
     </div>
@@ -777,6 +778,7 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
     MATCHED_COLUMNS, PARTIAL_COLUMNS, OVERDUE_COLUMNS, UNMATCHED_PAYMENTS_COLUMNS, MARK_PAID_COLUMNS,
     DEFAULT_TOLERANCE, DEFAULT_DATE_WINDOW_DAYS,
   } from './parovac.js';
+  import { orez, hlavicka as ukazkaHlavicka, priponaUkazky } from './ukazka.js';
   import { parse as parseCamt, toRows as camtToRows } from './camt053.js';
   import { isValid as licenceIsValid, load as licenceLoad, save as licenceSave, clear as licenceClear, claim as licenceClaim } from './licence.js';
   import {
@@ -905,6 +907,11 @@ ${SAMPLE_ENTRIES.map(sampleEntry).join('\n')}
     const p = (n) => String(n).padStart(2, '0');
     return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}`;
   }
+  // Do ukážkového súboru ide stránka s vysvetlením, nie priamy odkaz na
+  // pokladňu: súbor môže niekto otvoriť o mesiac a odkaz na Stripe sa medzitým
+  // zmení. Rovnako to má camt.053 do Excelu.
+  const KUPA_URL = 'https://arling.sk/bankove-nastroje/';
+
   function triggerDownload(text, filename, mime) {
     const blob = new Blob([text], { type: mime || 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -1189,24 +1196,31 @@ ${SAMPLE_ENTRIES.map(sampleEntry).join('\n')}
     if (!btn || !lastReport) return;
     const kind = btn.getAttribute('data-download');
     const [rows, cols, suffix] = LIST_FOR_DOWNLOAD[kind]();
-    const csv = toCsv(rows, { columns: cols });
-    triggerDownload(csv, `parovac-${suffix}-${dateStamp()}.csv`, 'text/csv');
-    track('download_csv', { list: kind, rows: rowBucket(rows.length) });
+    // Tabuľka na obrazovke je celá a zadarmo, stiahnutý súbor je bez licencie
+    // ukážka. Nezamykáme počet použití, ktorý obíde jedno inkognito okno, ale
+    // funkciu: nová relácia dá presne to isté ako stará.
+    const u = orez(rows, licenceState.valid);
+    let csv = toCsv(u.rows, { columns: cols });
+    if (u.orezane) csv = ukazkaHlavicka('sk', u.zobrazene, u.spolu, KUPA_URL) + '\r\n' + csv;
+    triggerDownload(csv, `parovac-${suffix}${priponaUkazky(u.orezane)}-${dateStamp()}.csv`, 'text/csv');
+    track(u.orezane ? 'ukazka_csv' : 'download_csv', { list: kind, rows: rowBucket(rows.length) });
   });
 
   $('markpaid-download-btn').addEventListener('click', () => {
     if (!lastReport) return;
     const fmt = $('markpaid-format-select').value;
+    const u = orez(lastReport.markPaid, licenceState.valid);
     let csv, filename;
     if (fmt && licenceState.valid) {
       csv = buildMarkPaidExport(fmt, lastReport.markPaid);
       filename = `parovac-uhradene-${fmt.toLowerCase()}-${dateStamp()}.csv`;
     } else {
-      csv = toCsv(lastReport.markPaid, { columns: MARK_PAID_COLUMNS });
-      filename = `parovac-uhradene-${dateStamp()}.csv`;
+      csv = toCsv(u.rows, { columns: MARK_PAID_COLUMNS });
+      if (u.orezane) csv = ukazkaHlavicka('sk', u.zobrazene, u.spolu, KUPA_URL) + '\r\n' + csv;
+      filename = `parovac-uhradene${priponaUkazky(u.orezane)}-${dateStamp()}.csv`;
     }
     triggerDownload(csv, filename, 'text/csv');
-    track('download_csv', { list: 'markpaid', rows: rowBucket(lastReport.markPaid.length) });
+    track(u.orezane ? 'ukazka_csv' : 'download_csv', { list: 'markpaid', rows: rowBucket(lastReport.markPaid.length) });
   });
 
   // ── run ──────────────────────────────────────────────────────────────
