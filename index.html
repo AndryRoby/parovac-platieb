@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="sk">
 <head>
-<script src="/style/vzhlad.js?v=dc0ce8df"></script>
+<script src="/style/vzhlad.js?v=2fa7f462"></script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://homelab.tailbf8f27.ts.net 'sha256-hpLUjl2oEXNDE1wrrELVRW24WfTiMP7fe+aN/um/lfI=' 'sha256-X4JIiZBrF1Ixq05YXHJ6wWCMAnjOEWSMc8qqUUVmOL8=' 'sha256-VUjwbQV1+ti15F9lW1pWeEOm4fLqne2Z8N98th6eUjc=' 'sha256-mVKIpuKCUomHT1VbZNGtYsnRi6jHwazFTClsMISgvOc=' 'sha256-WwiC/EcH5Yzpxy9+bWeqM3GxVAIQa+k8JbOp2zZjGSU='; connect-src 'self' https://homelab.tailbf8f27.ts.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
@@ -27,7 +27,8 @@
 <link rel="preload" href="/fonts/arling-sans.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/arling-serif.woff2" as="font" type="font/woff2" crossorigin>
 <!-- Jediný zdroj vzhľadu: ops/design/paper/paper.css, sem rozkopírovaný cez ops/design/sync-paper.mjs. -->
-<link rel="stylesheet" href="/style/paper.css?v=2ebf5aa4">
+<link rel="stylesheet" href="/style/paper.css?v=4ee4d148">
+<link rel="stylesheet" href="/style/nastroj.css?v=c9081cae">
 <script src="/style/prepinac.js?v=668e98c9" defer></script>
 <script defer src="https://homelab.tailbf8f27.ts.net/script.js" data-website-id="b5d77fa5-7b17-4bad-9c61-30eff842cf12"></script>
 
@@ -170,8 +171,7 @@
   .rules { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));
     gap:var(--gap); margin:0; padding:0; list-style:none; counter-reset:r; }
   .rules li { min-width:0; }
-  .rules li::before { counter-increment:r; content:counter(r,decimal-leading-zero);
-    font:500 12px/1 var(--ui); letter-spacing:.12em; color:var(--accent); display:block; margin-bottom:9px; }
+  /* bez cisla: styri nezavisle pravidla nie su postupnost */
   .rules b { display:block; color:var(--ink); font-weight:600; margin-bottom:5px; }
   .rules p { margin:0; font-size:clamp(15px,1.05vw,17px); overflow-wrap:anywhere; }
   .sub { max-width:66ch; margin:0 0 26px; }
@@ -188,7 +188,7 @@
      linka medzi nimi zalomí. Pravá je vyššia o tlačidlo s odznakom PRO. */
   .pane-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 16px;
     min-height:56px; border-bottom:1px solid var(--line); background:var(--paper-deep); flex-wrap:wrap; }
-  .pane-title { font:12px/1 var(--mono); letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
+  .pane-title { font:12px/1 var(--mono); letter-spacing:0; text-transform:none; color:var(--muted); }
   .pane-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
   .pane-head select { max-width:100%; }
 
@@ -202,7 +202,7 @@
   select:disabled, input:disabled { opacity:.55; cursor:default; }
 
   .form-section { display:flex; flex-direction:column; gap:10px; min-width:0; padding:16px; }
-  .form-section-title { font:12px/1 var(--mono); letter-spacing:.04em; text-transform:uppercase; color:var(--muted);
+  .form-section-title { font:12px/1 var(--mono); letter-spacing:0; text-transform:none; color:var(--muted);
     border-bottom:1px solid var(--line); padding-bottom:6px; display:flex; justify-content:space-between;
     align-items:baseline; gap:8px; flex-wrap:wrap; }
   .field { display:flex; flex-direction:column; gap:5px; min-width:0; }
@@ -220,7 +220,7 @@
   .json-in:focus { outline:none; border-color:var(--accent); }
 
   .mapping-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); gap:8px 10px; }
-  .mapping-grid .field label { font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; }
+  .mapping-grid .field label { font-size:10.5px; text-transform:none; letter-spacing:0; }
   .mapping-grid .field select { padding:6px 7px; font-size:12px; }
 
   .pro-row { border-top:1px solid var(--line); padding-top:12px; margin-top:2px; display:flex; flex-direction:column; gap:8px; }
@@ -291,7 +291,7 @@
   @media (max-width:820px) { .endpoint { grid-template-columns:minmax(0,1fr); } }
   .codeblock { border:1px solid var(--line); border-radius:var(--radius); background:var(--card); min-width:0; overflow:hidden; }
   .codeblock-head { padding:10px 14px; border-bottom:1px solid var(--line); background:var(--paper-deep);
-    font:11px/1 var(--mono); letter-spacing:.04em; text-transform:uppercase; color:var(--muted);
+    font:11px/1 var(--mono); letter-spacing:0; text-transform:none; color:var(--muted);
     display:flex; justify-content:space-between; align-items:center; gap:10px; }
   .codeblock pre { margin:0; border:none; border-radius:0; background:none; padding:16px 18px;
     font-size:12.5px; line-height:1.7; color:var(--body); }
@@ -384,7 +384,7 @@
   @media print { .sticky-cta { display:none !important; } }
 </style>
 </head>
-<body class="noc">
+<body class="noc nastroj">
 <div class="wash" aria-hidden="true"><i></i><i></i></div>
 
 <a class="skip site-skip" href="#arling-obsah" data-site-label="skip">Prejsť na obsah</a>
@@ -394,55 +394,50 @@
       <svg viewBox="0 0 488 215" width="38" height="15" aria-hidden="true" focusable="false"><path fill="#f4f4f7" fill-rule="evenodd" d="M0.00,213.00L74.00,214.00L181.00,85.00L285.00,214.00L360.00,214.00L206.00,21.00L185.00,4.00L164.00,10.00Z M221.00,0.00L263.00,50.00L395.00,50.00L409.00,55.00L419.00,76.00L401.00,96.00L313.00,98.00L411.00,214.00L487.00,214.00L422.00,139.00L457.00,123.00L482.00,88.00L482.00,48.00L463.00,19.00L417.00,0.00Z"/><path fill="#f2643c" d="M269.00,66.00L269.00,67.00L268.00,68.00L268.00,70.00L267.00,71.00L267.00,76.00L268.00,77.00L268.00,79.00L270.00,81.00L270.00,82.00L271.00,82.00L273.00,84.00L274.00,84.00L277.00,86.00L279.00,86.00L280.00,87.00L287.00,87.00L288.00,86.00L290.00,86.00L291.00,85.00L294.00,84.00L298.00,80.00L298.00,79.00L299.00,78.00L299.00,75.00L300.00,74.00L300.00,72.00L299.00,71.00L299.00,69.00L298.00,68.00L297.00,65.00L295.00,63.00L294.00,63.00L289.00,60.00L278.00,60.00L277.00,61.00L276.00,61.00L275.00,62.00L272.00,63.00Z"/></svg>
       <b>ARLing</b>
     </a>
-    <details class="site-menu" open>
-      <summary class="site-menu-toggle"><svg viewBox="0 0 18 12" fill="none" aria-hidden="true"><path d="M1 1h16M1 6h16M1 11h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span data-site-label="menu">Menu</span></summary>
-      <div class="site-menu-panel"><nav id="hlavne-menu" class="site-main-nav" aria-label="Hlavná navigácia" data-site-aria="nav"><a href="https://arling.sk/shop/" data-site-nav="0">Obchod</a><a href="https://arling.sk/#tools" data-site-nav="1">Nástroje</a><a href="https://arling.sk/games/" data-site-nav="2">Hry</a><a href="https://arling.sk/notes/" data-site-nav="3">Články</a><a href="https://arling.sk/ucet/" data-site-nav="4">Účet</a></nav><div class="site-page-links"><p data-site-label="stranka">Na tejto stránke</p><nav aria-label="Na tejto stránke" data-site-aria="stranka"><a href="#problem" data-umami-event="nav-parovac" data-umami-event-part="problem">Ako to funguje</a><a href="#playground" data-umami-event="nav-parovac" data-umami-event-part="playground">Párovanie</a><a href="#endpoint" data-umami-event="nav-parovac" data-umami-event-part="endpoint">API</a><a href="#pro" data-umami-event="nav-parovac" data-umami-event-part="pro">Pro</a><a href="#faq" data-umami-event="nav-parovac" data-umami-event-part="faq">Otázky</a></nav></div></div>
+    <details class="site-menu">
+      <summary class="site-menu-toggle"><span class="site-menu-text" data-site-label="produkty">Produkty</span><span class="site-menu-bars" aria-hidden="true"><i></i><i></i><i></i></span><span class="site-menu-word" data-site-label="menu">Menu</span></summary>
+      <div class="site-menu-panel" role="navigation" aria-label="Produkty" data-site-aria="produkty"><div class="site-cols"><div class="site-col"><p>Firemný softvér</p><ul><li><a href="https://arling.sk/proof/sk/"><b>Proof</b><span>Schválenie zákazníkom pred tlačou</span></a></li><li><a href="https://arling.sk/renewals/sk/"><b>Renewals</b><span>Doklady dodávateľov a termíny obnov</span></a></li><li><a href="https://arling.sk/asistent/"><b>Asistent</b><span>Predajný asistent pre e-shop</span></a></li></ul></div><div class="site-col"><p>Faktúry a platby</p><ul><li><a href="https://arling.sk/efaktura/"><b>E-faktúra</b><span>Kontrola, náhľad a tvorba XML</span></a></li><li><a href="https://arling.sk/sepa-pain001-doctor/"><b>Kontrola pain.001</b><span>Prečo banka odmietla súbor</span></a></li><li><a href="https://arling.sk/sepa-pain001-generator/"><b>Generátor pain.001</b><span>Hromadný príkaz z tabuľky</span></a></li><li><a href="https://arling.sk/camt053-to-excel/"><b>Výpis do Excelu</b><span>camt.053 a MT940 do tabuľky</span></a></li><li><a href="https://arling.sk/parovac-platieb/"><b>Párovač platieb</b><span>Výpis proti faktúram</span></a></li><li><a href="https://arling.sk/kontrola-suboru/"><b>Kontrola SEPA súboru</b><span>Pred zmenou v novembri 2026</span></a></li><li><a href="https://arling.sk/bankove-nastroje/"><b>Bankové nástroje Pro</b><span>Jedna licencia, štyri nástroje</span></a></li></ul></div><div class="site-col"><p>Dokumenty a firma</p><ul><li><a href="https://arling.sk/gdpr-dokumenty/"><b>GDPR dokumenty</b><span>Pre firmu a e-shop za 10 minút</span></a></li><li><a href="https://arling.sk/vzory-zmluv/"><b>Vzory zmlúv</b><span>Podľa slovenského práva, zadarmo</span></a></li><li><a href="https://arling.sk/zivotopis/"><b>Životopis</b><span>Hotové CV bez registrácie</span></a></li><li><a href="https://arling.sk/feed-doctor/"><b>Feed Doctor</b><span>Kontrola produktového feedu</span></a></li><li><a href="https://arling.sk/mail-doctor/"><b>Mail Doctor</b><span>SPF, DKIM a DMARC domény</span></a></li></ul></div><div class="site-col"><p>Vydavateľstvo</p><ul><li><a href="https://arling.sk/shop/"><b>Obchod</b><span>Knihy, hlavolamy a darčeky</span></a></li><li><a href="https://arling.sk/classics/"><b>Klasika pre e-ink</b><span>Knihy pripravené pre čítačku</span></a></li><li><a href="https://arling.sk/morning-quiet/"><b>Ranné ticho</b><span>Denné vydania na e-ink</span></a></li><li><a href="https://arling.sk/games/"><b>Hry v prehliadači</b><span>Denná logická hra zadarmo</span></a></li><li><a href="https://arling.sk/puzzle-post/"><b>Puzzle Post</b><span>Hlavolamy poštou</span></a></li><li><a href="https://arling.sk/memory-post/"><b>Memory Post</b><span>Spomienky na papieri</span></a></li></ul></div></div><p class="site-dev"><span>Pre vývojárov</span><a href="https://arling.sk/cors-doctor/">CORS</a><a href="https://arling.sk/jwt-doctor/">JWT</a><a href="https://arling.sk/cookie-samesite-doctor/">Cookie SameSite</a><a href="https://arling.sk/redirect-loop-doctor/">Redirect loop</a><a href="https://arling.sk/stripe-webhook-doctor/">Stripe webhook</a><a href="https://arling.sk/firebase-auth-domain-doctor/">Firebase auth</a><a href="https://arling.sk/google-oauth-redirect-doctor/">Google OAuth</a><a href="https://arling.sk/supabase-redirect-doctor/">Supabase redirect</a><a href="https://arling.sk/flutter-supabase-doctor/">Flutter + Supabase</a><a href="https://arling.sk/expo-universal-links-doctor/">Expo links</a><a href="https://arling.sk/expo-supabase-auth-doctor/">Expo + Supabase</a><a href="https://arling.sk/api/">Puzzle API</a></p><div class="site-col site-firma"><p>Firma</p><ul><li><a href="https://arling.sk/#nastroje"><b>Nástroje</b></a></li><li><a href="https://arling.sk/#piloty"><b>Piloty</b></a></li><li><a href="https://arling.sk/how-we-work/"><b>Ako pracujeme</b></a></li><li><a href="https://arling.sk/notes/"><b>Návody</b></a></li><li><a href="https://arling.sk/kontakt/"><b>Kontakt</b></a></li><li><a href="https://arling.sk/ucet/"><b>Účet</b></a></li><li><a href="https://arling.sk/brand/"><b>Značka</b></a></li><li><a href="https://arling.sk/podmienky/"><b>Podmienky</b></a></li><li><a href="https://arling.sk/privacy/"><b>Ochrana údajov</b></a></li><li><a href="https://arling.sk/impressum/"><b>Impressum</b></a></li></ul></div><p class="site-menu-cta"><a class="site-cta" href="https://arling.sk/proof/sk/" data-site-cta data-site-label="cta" data-umami-event="shell_cta_menu">Vyskúšať Proof zadarmo</a></p></div>
     </details>
+    <nav id="hlavne-menu" class="site-main-nav" aria-label="Hlavná navigácia" data-site-aria="nav"><a href="https://arling.sk/#nastroje" data-site-nav="0">Nástroje</a><a href="https://arling.sk/#piloty" data-site-nav="1">Piloty</a><a href="https://arling.sk/notes/" data-site-nav="2">Návody</a><a href="https://arling.sk/how-we-work/" data-site-nav="3">O firme</a></nav>
+    <a class="site-cta" href="https://arling.sk/proof/sk/" data-site-cta data-site-label="cta" data-umami-event="shell_cta">Vyskúšať Proof zadarmo</a>
   </div>
+  <div class="site-page-links"><div class="wrap"><p data-site-label="stranka">Na tejto stránke</p><nav aria-label="Na tejto stránke" data-site-aria="stranka"><a href="#problem" data-umami-event="nav-parovac" data-umami-event-part="problem">Ako to funguje</a><a href="#playground" data-umami-event="nav-parovac" data-umami-event-part="playground">Párovanie</a><a href="#endpoint" data-umami-event="nav-parovac" data-umami-event-part="endpoint">API</a><a href="#pro" data-umami-event="nav-parovac" data-umami-event-part="pro">Pro</a><a href="#faq" data-umami-event="nav-parovac" data-umami-event-part="faq">Otázky</a></nav></div></div>
 </header>
 
 <main id="arling-obsah" tabindex="-1">
-  <div class="wrap hero" id="hero">
-    <div>
-      <h1 id="h1"><span class="l">Výpis z banky</span>
-        <span class="l">a zoznam faktúr.</span>
-        <span class="l">Za sekundu viete,</span>
-        <span class="l">kto nezaplatil.</span></h1>
-      <p class="lead r d2">Nahrajte camt.053 výpis (alebo jeho CSV) a vložte zoznam vydaných faktúr. Nástroj ich spáruje podľa variabilného symbolu a sumy, ponúkne návrhy zhôd aj bez VS a ukáže, čo je po splatnosti.</p>
-      <div class="cta r d3">
-        <a class="btn btn-solid" href="#playground" data-umami-event="open-parovanie" data-umami-event-place="hero">Spárovať</a>
-        <a class="btn btn-line" href="https://github.com/AndryRoby/parovac-platieb" target="_blank" rel="noopener" data-umami-event="github_click" data-umami-event-place="hero">Zdrojový kód na GitHube</a>
-      </div>
-      <nav class="index r d4" aria-label="Obsah">
-        <a href="#problem" data-umami-event="index-parovac" data-umami-event-part="problem"><span class="n">01</span><span class="t">Ako to funguje</span><span class="dots"></span><span class="c">tri veci, ktoré zaberú čas</span></a>
-        <a href="#playground" data-umami-event="index-parovac" data-umami-event-part="playground"><span class="n">02</span><span class="t">Párovanie</span><span class="dots"></span><span class="c">faktúry a výpis</span></a>
-        <a href="#endpoint" data-umami-event="index-parovac" data-umami-event-part="endpoint"><span class="n">03</span><span class="t">API</span><span class="dots"></span><span class="c">parovac.js, 0 závislostí</span></a>
-        <a href="#pro" data-umami-event="index-parovac" data-umami-event-part="pro"><span class="n">04</span><span class="t">Pro</span><span class="dots"></span><span class="c">9 € mesačne alebo 79 € ročne</span></a>
-        <a href="#faq" data-umami-event="index-parovac" data-umami-event-part="faq"><span class="n">05</span><span class="t">Otázky</span><span class="dots"></span><span class="c">6 odpovedí</span></a>
+  <div class="wrap uv-lead" id="hero">
+    <p class="uv-masthead"><span>Párovač platieb</span><span>Nástroje pre prácu</span><span>ARLing s. r. o., Bratislava</span></p>
+    <div class="uv-lead-grid">
+      <div>
+        <h1 id="h1">Za sekundu viete, kto nezaplatil.</h1>
+        <p class="uv-lead-p">Nahráte výpis camt.053 alebo jeho CSV, vložíte zoznam vydaných faktúr a nástroj ich spáruje podľa variabilného symbolu a sumy, ponúkne návrhy zhôd aj bez symbolu a ukáže, čo je po splatnosti.</p>
+        <p class="uv-actions">
+          <a class="btn btn-solid" href="#playground" data-umami-event="open-parovanie" data-umami-event-place="hero">Spárovať</a>
+          <a class="uv-quiet" href="https://github.com/AndryRoby/parovac-platieb" target="_blank" rel="noopener" data-umami-event="github_click" data-umami-event-place="hero">Zdrojový kód na GitHube</a>
+        </p>
+        <dl class="uv-facts">
+          <div><dt>Zadarmo</dt><dd>Párovanie aj celé tabuľky na obrazovke, bez účtu a bez limitu na počet riadkov.</dd></div>
+          <div><dt>Platí sa</dt><dd><b>9 €</b> mesačne alebo <b>79 €</b> ročne za Pro: celý stiahnutý súbor, história a návrhy okolo splatnosti.</dd></div>
+          <div><dt>Hranice</dt><dd><b>4</b> banky (Tatra banka, SLSP, VÚB, ČSOB) a <b>6</b> formátov faktúr: Pohoda, Omega, Money S3, SuperFaktúra, iDoklad, Fakturoid.</dd></div>
+          <div><dt>Vaše údaje</dt><dd>Všetko beží vo vašom prehliadači. Výpis ani faktúry sa nikam neodosielajú, <b>178</b> automatizovaných testov to drží.</dd></div>
+        </dl>
+      <nav class="index uv-index r d4" aria-label="Obsah">
+        <a href="#problem" data-umami-event="index-parovac" data-umami-event-part="problem"><span class="t">Ako to funguje</span><span class="dots"></span><span class="c">tri veci, ktoré zaberú čas</span></a>
+        <a href="#playground" data-umami-event="index-parovac" data-umami-event-part="playground"><span class="t">Párovanie</span><span class="dots"></span><span class="c">faktúry a výpis</span></a>
+        <a href="#endpoint" data-umami-event="index-parovac" data-umami-event-part="endpoint"><span class="t">API</span><span class="dots"></span><span class="c">parovac.js, 0 závislostí</span></a>
+        <a href="#pro" data-umami-event="index-parovac" data-umami-event-part="pro"><span class="t">Pro</span><span class="dots"></span><span class="c">9 € mesačne alebo 79 € ročne</span></a>
+        <a href="#faq" data-umami-event="index-parovac" data-umami-event-part="faq"><span class="t">Otázky</span><span class="dots"></span><span class="c">6 odpovedí</span></a>
       </nav>
-      <ul class="proof facts r d5">
-        <li><b>4</b> banky: Tatra banka, SLSP, VÚB, ČSOB</li>
-        <li><b>6</b> formátov faktúr: Pohoda, Omega, Money S3, SuperFaktúra, iDoklad, Fakturoid</li>
-        <li><b>155</b> automatizované testy</li>
-        <li><b>0 €</b>, celé tabuľky na obrazovke</li>
-        <li>beží vo vašom prehliadači</li>
-      </ul>
-    </div>
-    <div class="r d3">
-      <div class="shot">
-        <div class="chrome"><i></i><i></i><i></i></div>
-        <!-- Jediný obrázok na stránke, na desktope je nad ohybom, teda je to LCP prvok.
-             Preto bez loading="lazy" a s fetchpriority="high": lazy by ho odsunulo na koniec fronty.
-             Ostatné obrázky (keby pribudli) ostanu lazy podľa paper-v2 §9 bod 8. -->
-        <img src="/press/parovac-platieb-2-results.webp" width="1230" height="631" fetchpriority="high" decoding="async"
-             alt="Výsledok párovania v nástroji Párovač platieb: štyri spárované faktúry, jeden preplatok, jedna faktúra po splatnosti a jedna nespárovaná platba.">
       </div>
+      <figure class="uv-lead-art">
+        <img src="nahlad/vysledok.png" width="1598" height="940" loading="eager" fetchpriority="high" decoding="async" alt="Výsledok párovania v nástroji Párovač platieb: štyri spárované faktúry, jeden preplatok, jedna faktúra po splatnosti a jedna nespárovaná platba.">
+        <figcaption>Výsledok párovania nad ukážkovými faktúrami a ukážkovým výpisom: štyri spárované, jeden preplatok, jedna po splatnosti a jedna nespárovaná platba. Skutočná snímka z tohto nástroja, spustená nad jeho vlastnou ukážkou.</figcaption>
+      </figure>
     </div>
   </div>
 
   <section id="problem" class="deep">
     <div class="wrap">
-      <p class="kicker r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 17a8.5 8.5 0 1 1 15 0"/><path d="M12 13.5l3.5-3.2"/><circle cx="12" cy="14.5" r="1"/></svg>01</p>
       <h2 class="r d1">Tri veci, ktoré pri ručnom párovaní najčastejšie zaberú čas alebo sa pokazia.</h2>
       <div class="rule"></div>
       <p class="sub r d2">Porovnávať výpis z banky s tabuľkou faktúr riadok po riadku sa dá, ale pri väčšom počte faktúr je to pomalé a chybové.</p>
@@ -465,7 +460,6 @@
 
   <section id="playground">
     <div class="wrap">
-      <p class="kicker r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M9 10v9M15 10v9"/></svg>02</p>
       <h2 class="r d1">Vložte faktúry, nahrajte výpis. Dostanete štyri zoznamy.</h2>
       <div class="rule"></div>
       <p class="sub r d2">Nič z toho, čo vložíte alebo nahráte, sa neodosiela. Párovanie beží vo vašom prehliadači.</p>
@@ -585,7 +579,6 @@
 
   <section id="endpoint" class="deep">
     <div class="wrap">
-      <p class="kicker r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M9 8V5.5M15 8V5.5M4 13h2M18 13h2"/></svg>03</p>
       <h2 class="r d1">Štyri funkcie. Faktúry a výpis dnu, štyri zoznamy von.</h2>
       <div class="rule"></div>
       <p class="sub r d2">Žiadny server, žiadny API kľúč, žiadna registrácia. <code>parovac.js</code> je čistý JavaScript bez závislostí: prečítajte si ho, forknite, alebo ho spustite vo vlastnom kóde či CI.</p>
@@ -626,7 +619,6 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
 
   <section id="pro">
     <div class="wrap">
-      <p class="kicker r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="12" r="3.5"/><path d="M11.5 12H21M18 12v3M15 12v2.2"/></svg>04</p>
       <h2 class="r d1">Pro pre účtovníka, ktorý to robí každý mesiac.</h2>
       <div class="rule"></div>
       <p class="sub r d2">Bezplatná verzia ukáže celé tabuľky na obrazovke, bez limitu na počet riadkov, navždy. Stiahnutý súbor má bez licencie prvých 20 riadkov ako ukážku. Pro je pohodlie pri opakovanom mesačnom spracovaní viacerých účtov, nie odomknutá funkčnosť párovania.</p>
@@ -688,7 +680,6 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
 
   <section id="faq" class="deep">
     <div class="wrap">
-      <p class="kicker r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.3l2.4 2.4 4.6-4.9"/></svg>05</p>
       <h2 class="r d1">Otázky, ktoré ľudia naozaj hľadajú.</h2>
       <div class="rule"></div>
       <p class="sub r d2">Priame odpovede na otázky o párovaní výpisu z banky s faktúrami.</p>
@@ -734,7 +725,7 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
             <button class="btn btn-solid" type="submit" data-umami-event="subscribe_submit" data-umami-event-place="parovac">Dať vedieť</button>
           </form>
           <p id="subscribe-thanks" hidden>Ďakujeme. Ozveme sa len vtedy, keď bude niečo nové.</p>
-          <p id="subscribe-error" hidden>Nepodarilo sa uložiť. Napíšte na <a href="mailto:andrej@arling.sk">andrej@arling.sk</a>.</p>
+          <p id="subscribe-error" hidden>Nepodarilo sa uložiť. Napíšte na <a href="mailto:andrej@arling.sk" data-umami-event="klik_email" data-umami-event-produkt="parovac-platieb">andrej@arling.sk</a>.</p>
           <p class="fineprint subscribe-privacy"><a href="https://arling.sk/privacy/">Súkromie</a></p>
         </div>
         <div class="ask business-ask r d2" id="business">
@@ -743,6 +734,23 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
           <a class="btn btn-line" href="mailto:andrej@arling.sk?subject=Parovac%20platieb%20pre%20firmu" data-umami-event="business_interest">Napísať, čo potrebujem</a>
         </div>
       </div>
+    </div>
+  </section>
+  <section class="uv-colophon" id="tirag">
+    <div class="wrap">
+      <h2 class="r">Kto to vydáva a ako to prebieha.</h2>
+      <dl class="uv-colophon-rows">
+        <div><dt>Vydavateľ</dt><dd>ARLing s. r. o., Ivanská cesta 32E, 821 04 Bratislava, Slovensko. IČO 56583486, IČ DPH SK2122352100.</dd></div>
+        <div><dt>Kto to robí</dt><dd>Píše a udržiava ho jeden človek v Bratislave. Jadro <code>parovac.js</code> je čistý JavaScript bez závislostí a je verejné na <a href="https://github.com/AndryRoby/parovac-platieb">GitHube</a>.</dd></div>
+        <div><dt>Platba a doručenie</dt><dd>Platbu spracuje Stripe, ktorý je voči vám predajcom, vystaví doklad a odvedie DPH. Licenčný kľúč príde e-mailom hneď po zaplatení.</dd></div>
+        <div><dt>Ukážka a podmienky</dt><dd>Tlačidlo ukážka načíta 6 faktúr a výpis, takže celý nástroj si vyskúšate pred platbou.</dd></div>
+        <div><dt>Odpoveď</dt><dd>Na <a href="mailto:andrej@arling.sk" data-umami-event="klik_email" data-umami-event-produkt="parovac">andrej@arling.sk</a> odpovedáme do 24 hodín.</dd></div>
+        <div><dt>Čo to nie je</dt><dd>Nie sme banka ani účtovná firma. Párovanie je návrh, o zaúčtovaní rozhodujete vy.</dd></div>
+      </dl>
+      <p class="uv-colophon-akcie">
+        <a class="btn btn-line" href="https://arling.sk/podmienky/">Podmienky</a>
+        <a class="btn btn-line" href="https://arling.sk/privacy/">Ochrana údajov</a>
+      </p>
     </div>
   </section>
 </main>
@@ -756,11 +764,13 @@ const csv = toCsv(rep.matched, { columns: MATCHED_COLUMNS });</pre>
   <a href="#faq" aria-label="Otázky"><i></i><span>Otázky</span></a>
 </nav>
 
-<footer>
+<footer class="site-footer">
   <div class="wrap foot">
-    <div><b>ARLing s. r. o.</b><br>Ivanská cesta 32E<br>821 04 Bratislava, Slovensko</div>
-    <div>IČO 56583486<br>IČ DPH SK2122352100<br><a href="mailto:andrej@arling.sk">andrej@arling.sk</a></div>
-    <div><a href="https://arling.sk/shop/">obchod</a> · <a href="https://arling.sk/privacy/">ochrana údajov</a> · <a href="https://arling.sk/podmienky/">podmienky</a> · <a href="https://arling.sk/gdpr/">GDPR</a> · <a href="https://arling.sk/impressum/">Impressum</a> · <a href="https://arling.sk/llms.txt">llms.txt</a> · <a href="https://arling.sk/sitemap-index.xml">mapa stránky</a><br>Nástroje sú poskytované tak, ako sú, bez záruky. Anonymné počty návštev cez vlastné Umami.</div>
+    <div class="site-foot-top"><div><a class="site-brand" href="https://arling.sk/" aria-label="ARLing: úvod" data-site-home><svg viewBox="0 0 488 215" width="38" height="15" aria-hidden="true" focusable="false"><path fill="#f4f4f7" fill-rule="evenodd" d="M0.00,213.00L74.00,214.00L181.00,85.00L285.00,214.00L360.00,214.00L206.00,21.00L185.00,4.00L164.00,10.00Z M221.00,0.00L263.00,50.00L395.00,50.00L409.00,55.00L419.00,76.00L401.00,96.00L313.00,98.00L411.00,214.00L487.00,214.00L422.00,139.00L457.00,123.00L482.00,88.00L482.00,48.00L463.00,19.00L417.00,0.00Z"/><path fill="#f2643c" d="M269.00,66.00L269.00,67.00L268.00,68.00L268.00,70.00L267.00,71.00L267.00,76.00L268.00,77.00L268.00,79.00L270.00,81.00L270.00,82.00L271.00,82.00L273.00,84.00L274.00,84.00L277.00,86.00L279.00,86.00L280.00,87.00L287.00,87.00L288.00,86.00L290.00,86.00L291.00,85.00L294.00,84.00L298.00,80.00L298.00,79.00L299.00,78.00L299.00,75.00L300.00,74.00L300.00,72.00L299.00,71.00L299.00,69.00L298.00,68.00L297.00,65.00L295.00,63.00L294.00,63.00L289.00,60.00L278.00,60.00L277.00,61.00L276.00,61.00L275.00,62.00L272.00,63.00Z"/></svg><b>ARLing</b></a><p class="site-foot-firma">ARLing s. r. o., IČO <span class="num">56583486</span>, Bratislava. Vlastný server v Európskej únii. Softvér pre firmy, živnostníkov aj jednotlivcov.</p></div><a class="site-cta" href="https://arling.sk/proof/sk/" data-umami-event="shell_footer_cta">Vyskúšať Proof zadarmo<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></a></div>
+    <div class="site-foot-cols"><div><p>Firemný softvér</p><ul><li><a href="https://arling.sk/proof/sk/">Proof</a></li><li><a href="https://arling.sk/renewals/sk/">Renewals</a></li><li><a href="https://arling.sk/asistent/">Asistent</a></li></ul></div><div><p>Faktúry a platby</p><ul><li><a href="https://arling.sk/efaktura/">E-faktúra</a></li><li><a href="https://arling.sk/sepa-pain001-doctor/">Kontrola pain.001</a></li><li><a href="https://arling.sk/sepa-pain001-generator/">Generátor pain.001</a></li><li><a href="https://arling.sk/camt053-to-excel/">Výpis do Excelu</a></li><li><a href="https://arling.sk/parovac-platieb/">Párovač platieb</a></li><li><a href="https://arling.sk/kontrola-suboru/">Kontrola SEPA súboru</a></li><li><a href="https://arling.sk/bankove-nastroje/">Bankové nástroje Pro</a></li></ul></div><div><p>Dokumenty a firma</p><ul><li><a href="https://arling.sk/gdpr-dokumenty/">GDPR dokumenty</a></li><li><a href="https://arling.sk/vzory-zmluv/">Vzory zmlúv</a></li><li><a href="https://arling.sk/zivotopis/">Životopis</a></li><li><a href="https://arling.sk/feed-doctor/">Feed Doctor</a></li><li><a href="https://arling.sk/mail-doctor/">Mail Doctor</a></li></ul></div><div><p>Vydavateľstvo</p><ul><li><a href="https://arling.sk/shop/">Obchod</a></li><li><a href="https://arling.sk/classics/">Klasika pre e-ink</a></li><li><a href="https://arling.sk/morning-quiet/">Ranné ticho</a></li><li><a href="https://arling.sk/games/">Hry v prehliadači</a></li><li><a href="https://arling.sk/puzzle-post/">Puzzle Post</a></li><li><a href="https://arling.sk/memory-post/">Memory Post</a></li></ul></div><div><p>Firma</p><ul><li><a href="https://arling.sk/how-we-work/">Ako pracujeme</a></li><li><a href="https://arling.sk/notes/">Návody</a></li><li><a href="https://arling.sk/kontakt/">Kontakt</a></li><li><a href="https://arling.sk/ucet/">Účet</a></li><li><a href="https://arling.sk/brand/">Značka</a></li><li><a href="https://arling.sk/podmienky/">Podmienky</a></li><li><a href="https://arling.sk/privacy/">Ochrana údajov</a></li><li><a href="https://arling.sk/impressum/">Impressum</a></li></ul></div></div>
+    <p class="site-dev"><span>Pre vývojárov</span><a href="https://arling.sk/cors-doctor/">CORS</a><a href="https://arling.sk/jwt-doctor/">JWT</a><a href="https://arling.sk/cookie-samesite-doctor/">Cookie SameSite</a><a href="https://arling.sk/redirect-loop-doctor/">Redirect loop</a><a href="https://arling.sk/stripe-webhook-doctor/">Stripe webhook</a><a href="https://arling.sk/firebase-auth-domain-doctor/">Firebase auth</a><a href="https://arling.sk/google-oauth-redirect-doctor/">Google OAuth</a><a href="https://arling.sk/supabase-redirect-doctor/">Supabase redirect</a><a href="https://arling.sk/flutter-supabase-doctor/">Flutter + Supabase</a><a href="https://arling.sk/expo-universal-links-doctor/">Expo links</a><a href="https://arling.sk/expo-supabase-auth-doctor/">Expo + Supabase</a><a href="https://arling.sk/api/">Puzzle API</a></p>
+    <div class="site-foot-bottom"><p>ARLing s. r. o., Ivanská cesta 32E, 821 04 Bratislava, Slovensko. IČO 56583486, IČ DPH SK2122352100. <a href="mailto:andrej@arling.sk">andrej@arling.sk</a></p><p><a href="https://arling.sk/impressum/">Impressum</a> · <a href="https://arling.sk/llms.txt">llms.txt</a> · <a href="https://arling.sk/sitemap-index.xml">Sitemap</a></p></div>
+    <p class="site-foot-legal">Nástroje sú poskytované tak, ako sú, bez záruky. Anonymné počty návštev cez vlastné Umami. <a href="https://arling.sk/privacy/">Ochrana údajov</a> · <a href="https://arling.sk/podmienky/">Podmienky</a> · <a href="https://arling.sk/gdpr/">GDPR</a></p>
   </div>
 </footer>
 
