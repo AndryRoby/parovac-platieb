@@ -7,7 +7,8 @@
 // ten Excel a dostal ho.
 //
 // Nový model je „náhľad zadarmo, súbor za peniaze“:
-//   - celá tabuľka sa zobrazí na obrazovke, úplná, bez licencie, navždy;
+//   - tabuľka sa zobrazí na obrazovke aj bez licencie (camt053 najviac
+//     TABLE_ROW_LIMIT = 200 riadkov, index.html; párovač ukazuje zoznamy celé);
 //   - stiahnutý súbor má bez licencie prvých 20 riadkov a v prvom riadku napísané,
 //     že je to ukážka a koľko riadkov chýba.
 // Inkognito okno tým prestáva byť cesta okolo: nezamykáme počet použití, zamykáme

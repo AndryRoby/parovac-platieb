@@ -44,7 +44,7 @@ Run once per invoice, in this fixed order:
 
 ## Output
 
-Four lists, each downloadable as CSV:
+Four lists, shown in full on screen and each downloadable as CSV (without a licence the download holds the first 20 rows as a sample):
 
 1. Matched (VS + amount).
 2. Partial payments / overpayments (VS matched, amount differs).
@@ -61,7 +61,7 @@ Static HTML plus two dependency-free scripts (`camt053.js`, copied unmodified fr
 
 ## Pro (9 EUR/month or 79 EUR/year, optional)
 
-Core matching (one statement against one invoice list, any supported input format, no cap on the number of rows) is, and stays, entirely free. Pro is aimed at an accountant or company running this every month across more than one account, and adds:
+Core matching (one statement against one invoice list, any supported input format, no cap on the number of rows) is, and stays, free, with every list shown in full on screen; without a licence a downloaded CSV holds the first 20 rows as a sample. Pro is aimed at an accountant or company running this every month across more than one account, and adds:
 
 - **Multiple statements and accounts at once**, instead of one statement against one invoice list per session.
 - **Saved column-mapping presets**, so a recurring monthly export from the same accounting program doesn't need remapping each time.
@@ -95,7 +95,7 @@ It's the free-tier default distance between a payment date and an invoice's due 
 Payments sharing the same VS are summed before matching, so the invoice is evaluated against the total received, and shows as matched once installments add up to the invoice amount within tolerance.
 
 **Is there a row limit on the free tier?**
-No, for either the statement or the invoice list. Pro's limits are about running more than one statement/account at once and saved presets, not a row cap on a single match.
+Not on the matching: the statement and the invoice list can be any length, and every list shows in full on screen. The only row limit is on the download: without a licence each downloaded CSV holds the first 20 rows as a sample. Pro also adds running more than one statement or account at once and saved presets.
 
 **Does anything get uploaded when I use the file picker instead of pasting?**
 No. Files are read locally via the browser's `FileReader` API, the same way pasted text is parsed, and never leave the page.
