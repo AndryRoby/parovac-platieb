@@ -69,7 +69,7 @@ Core matching (one statement against one invoice list, any supported input forma
 - **Export formatted for import into Pohoda, Omega, or Money S3**, rather than the free tier's generic CSV.
 - **Match history**: previous runs, retrievable without re-uploading.
 
-Purchase goes through Stripe Checkout (9 EUR per month or 79 EUR per year, `BUY_URL` and `BUY_URL_YEAR` in `pro.js`) as part of the bundle Bankové nástroje pre účtovníkov.
+Purchase goes through Stripe Checkout (9 EUR per month or 79 EUR per year, `BUY_URL` and `BUY_URL_YEAR` in `pro.js`) as part of the bundle Bankové nástroje pre účtovníkov. The licence is sold through Stripe Managed Payments; the merchant of record is Link (Sold through Link, LLC), which sends the receipt and the invoice as a PDF. Cancel at any time in the Stripe customer portal (https://billing.stripe.com/p/login/3cIaER9M63hNeFcg8B4ko00); refund of a subscription on request within 14 days of purchase via support@arling.sk (terms https://arling.sk/podmienky/en/, sections 4 to 6).
 
 Licence mechanics are the same mechanism as the sibling SEPA pain.001 Generátor: after payment, the page requests a signed licence (Ed25519 signature over a small JSON payload carrying the plan and expiry) from `https://homelab.tailbf8f27.ts.net/licence/api/claim?session_id=` and stores it in the browser's `localStorage`. Verification happens entirely client-side via the browser's WebCrypto API against a public key baked into `licence.js` (`xcMFelDwaZ1DC7ObQTKi8zXPvMlrTAlgZySNpfuYbC8`); no server call happens on ordinary use after that. The plan identifier is `sepa-pro`, the shared plan of the bundle Bankové nástroje pre účtovníkov (https://arling.sk/bankove-nastroje/): one licence key unlocks Pro in the SEPA pain.001 Generátor, camt.053 to Excel and this tool. No account or login is involved; the same licence key can be pasted into the page on a different browser or computer to activate Pro there too.
 
@@ -119,4 +119,4 @@ No account, no login, no cookies for the tool itself, no server-side processing 
 
 ## Contact
 
-Built by ARLing s. r. o. (Bratislava, Slovakia). andrej@arling.sk
+Built by ARLing s. r. o. (Bratislava, Slovakia). support@arling.sk (English, German), podpora@arling.sk (Slovak)

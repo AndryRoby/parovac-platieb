@@ -1,181 +1,200 @@
-# Párovač platieb: výpis z banky proti faktúram
+# Payment matcher (Párovač platieb): bank statement against issued invoices
 
-Live: https://arling.sk/parovac-platieb/
+Payment matcher is a browser tool for Slovak accountants and companies that check every month which issued invoices were paid: it matches a camt.053 bank statement (Tatra banka, SLSP, VÚB, ČSOB) against a list of invoices by variable symbol (VS) and amount, suggests matches without a VS, and shows what is unpaid or overpaid. Matching and the full tables on screen are free with no row limit; without a licence the downloaded file holds the first 20 rows as a sample, and the full download plus convenience features come with the Pro licence for €9 a month or €79 a year (VAT included) at https://arling.sk/bankove-nastroje/, which also covers SEPA pain.001 Generator and camt.053 to Excel.
 
-Bezplatný nástroj, ktorý beží celý v prehliadači a spáruje **výpis z
-bankového účtu** (formát `camt.053` z Tatra banky, SLSP, VÚB alebo
-ČSOB) so **zoznamom vydaných faktúr** (export z Pohody, Omegy, Money
-S3, SuperFaktúry, iDokladu, Fakturoidu, alebo len ručná tabuľka v
-Exceli), aby nebolo treba každý mesiac ručne prezerať výpis riadok po
-riadku a hľadať, ktorá platba patrí ku ktorej faktúre.
+Live: https://arling.sk/parovac-platieb/ (Slovak) · https://arling.sk/parovac-platieb/en/ (English) · https://arling.sk/parovac-platieb/de/ (German)
 
-## Pre koho je
+## Who it is for
 
-Slovenský účtovník alebo firma, ktorá si mesačne (alebo častejšie)
-kontroluje, ktoré vydané faktúry sú uhradené a ktoré nie, a robí to
-dnes ručne: porovnávaním výpisu s tabuľkou faktúr podľa variabilného
-symbolu a sumy. Táto kontrola je typický zdroj chýb (preklep vo VS,
-klient zaplatí zlú sumu, platba príde v inom mesiaci ako splatnosť) a
-pri väčšom počte faktúr zaberie hodiny.
+A Slovak bookkeeper or company that checks monthly (or more often)
+which issued invoices are paid and which are not, and does it by hand
+today: comparing the statement with a table of invoices by variable
+symbol and amount. That check is a typical source of errors (a typo in
+the VS, a client paying the wrong amount, a payment arriving in a
+different month than the due date) and takes hours with many invoices.
 
-## Vstup: platby
+## Input: payments
 
-- `camt.053` XML výpis (formát, ktorý ako predvolený export do
-  účtovníctva ponúkajú Tatra banka, SLSP, VÚB aj ČSOB), spracovaný cez
-  ten istý parser ako sesterský nástroj camt.053 do Excelu
+- A `camt.053` XML statement (the format Tatra banka, SLSP, VÚB and
+  ČSOB offer as the default export for accounting), read by the same
+  parser as the sibling tool camt.053 to Excel
   (https://arling.sk/camt053-to-excel/): `camt053.js`,
   `window.CamtConverter.parse` / `.toRows`.
-- alebo CSV export z toho istého nástroja (`camt053-to-excel`), ak už
-  výpis máte prevedený do tabuľky.
+- Or a CSV export from that same tool (`camt053-to-excel`), if the
+  statement is already converted to a table.
 
-## Vstup: faktúry
+## Input: invoices
 
-Vložený text skopírovaný z Excelu (tabulátormi oddelené stĺpce) alebo
-nahraný CSV/TSV súbor. Stĺpce sa rozpoznávajú automaticky podľa
-hlavičky:
+Text pasted from Excel (tab-separated columns) or an uploaded CSV/TSV
+file. Columns are detected automatically by their header:
 
-| Pole | Rozpoznávané hlavičky |
+| Field | Recognised headers |
 |---|---|
-| Číslo faktúry | `číslo faktúry`, `faktúra`, `doklad` |
-| Variabilný symbol | `vs`, `variabilný symbol` |
-| Suma / k úhrade | `suma`, `celkom`, `k úhrade`, `amount` |
-| Splatnosť | `splatnosť`, `due date` |
-| Odberateľ / firma | `odberateľ`, `firma`, `zákazník`, `customer` |
-| Mena | `mena`, `currency` |
-| Uhradené | `uhradené`, `zaplatené`, `paid` |
+| Invoice number | `číslo faktúry`, `faktúra`, `doklad` |
+| Variable symbol | `vs`, `variabilný symbol` |
+| Amount / to pay | `suma`, `celkom`, `k úhrade`, `amount` |
+| Due date | `splatnosť`, `due date` |
+| Customer / company | `odberateľ`, `firma`, `zákazník`, `customer` |
+| Currency | `mena`, `currency` |
+| Paid | `uhradené`, `zaplatené`, `paid` |
 
-Ak automatické rozpoznanie stĺpec netrafí (alebo hlavičky sedia na
-nič z tabuľky vyššie), každý stĺpec má vedľa seba ručný výber, ktorým
-sa mapovanie prepíše pred spustením párovania. Pre exporty z Pohody,
-Omegy, Money S3, SuperFaktúry, iDokladu a Fakturoidu sú pribalené
-heuristiky (typické stĺpcové hlavičky, ktoré tieto programy pri
-exporte používajú); sú to heuristiky, nie oficiálne overené
-špecifikácie od výrobcov, a nástroj to pri výbere šablóny aj
-poctivo hovorí.
+If automatic detection misses a column (or the headers match nothing in
+the table above), every column has a manual selector to override the
+mapping before matching. Exports from Pohoda, Omega, Money S3,
+SuperFaktúra, iDoklad and Fakturoid come with bundled heuristics
+(typical column headers these programs use in their exports); they are
+heuristics, not specifications verified with the vendors, and the tool
+says so when you pick a template.
 
-## Ako prebieha párovanie
+## How matching works
 
-Pre každú faktúru sa platby z výpisu skúšajú priradiť v tomto poradí:
+For each invoice, payments from the statement are tried in this order:
 
-1. **VS zhodný a suma zhodná** (tolerancia v centoch je
-   nastaviteľná, predvolene 0,01 EUR): spárované.
-2. **VS zhodný, suma iná**: označené ako čiastočná úhrada alebo
-   preplatok, s rozdielom sumy.
-3. **Bez zhodného VS**: ak je suma zhodná, dátum platby je najviac 45
-   dní od splatnosti faktúry a takáto zhoda je jediná možná (nie je
-   viacznačná), platba sa označí ako **návrh** na spárovanie namiesto
-   automatického priradenia.
-4. **Zvyšok**: nespárované platby aj nespárované faktúry zostávajú
-   v samostatných zoznamoch.
+1. **Same VS and same amount** (amount tolerance 0.01 EUR by
+   default): matched.
+2. **Same VS, different amount**: marked as a partial payment or an
+   overpayment, with the difference.
+3. **No matching VS**: if the amount matches, the payment date is at
+   most 45 days from the invoice due date, and the match is the only
+   possible one (not ambiguous), the payment is marked as a
+   **suggestion** instead of being assigned automatically.
+4. **The rest**: unmatched payments and unmatched invoices stay in
+   separate lists.
 
-Viac platieb prislúchajúcich jednej faktúre (splátky) sa pri
-párovaní podľa VS sčítajú, takže faktúra uhradená v dvoch alebo
-viacerých čiastkach sa vyhodnotí správne ako uhradená.
+Several payments for one invoice (instalments) are added up when
+matching by VS, so an invoice paid in two or more parts is correctly
+evaluated as paid.
 
-Výstupom sú štyri zoznamy: spárované, čiastočné/preplatky, návrhy na
-spárovanie (bez VS) a nespárované, s možnosťou stiahnuť ich ako CSV.
+The output is four lists: matched, partial or overpaid, suggestions
+(no VS) and unmatched. All four are shown in full on screen for free.
 
-## Ako to funguje (len v prehliadači)
+## How it works (in the browser only)
 
-Nástroj beží ako statická stránka a jeden engine skript
-(`parovac.js`, bez závislostí, funguje rovnako v prehliadači aj v
-Node.js). Výpis aj zoznam faktúr sa spracujú priamo vo vašom
-prehliadači; nikam sa neposielajú. Jediná sieťová aktivita, ktorú
-stránka vyvolá:
+The tool is a static page with one engine script (`parovac.js`, no
+dependencies, works the same in the browser and in Node.js). The
+statement and the invoice list are processed in your browser and are
+not sent anywhere. The only network activity the page causes:
 
-- načítanie vlastných statických súborov (HTML/CSS/JS) z GitHub
-  Pages,
-- anonymné analytické udalosti (zobrazenie stránky, kliknutie na
-  "spárovať" a podobne) do vlastnej inštancie Umami: len názvy
-  udalostí a počty, nikdy obsah výpisu ani faktúr,
-- a iba ak vyplníte e-mail do voliteľného formulára na odber
-  noviniek, požiadavka na e-mailový endpoint s touto adresou a ničím
-  iným.
+- loading its own static files (HTML/CSS/JS) from GitHub Pages,
+- anonymous analytics events (page view, "match" clicked and similar)
+  to a self-hosted Umami instance: event names and counts only, never
+  the content of the statement or invoices,
+- licence verification after a purchase,
+- and, only if you fill in the optional news sign-up form, a request
+  to the e-mail endpoint with that address and nothing else.
 
-Overiť si to môžete sami: otvorte si v prehliadači záložku Sieť
-(Network) počas používania nástroja, alebo si prečítajte `index.html`
-a `parovac.js` priamo; sú to statické súbory bez build kroku.
+You can check this yourself in the browser's Network tab, or by
+reading `index.html` and `parovac.js`; they are static files with no
+build step.
 
-## Free a Pro
+## Free and Pro
 
-Základné párovanie (jeden výpis proti jednému zoznamu faktúr,
-ktorýkoľvek z podporovaných formátov, bez limitu na počet riadkov)
-je a zostáva úplne zadarmo.
+Free, with no account: matching one statement against one invoice
+list, in any supported format, with the full tables on screen and no
+limit on the number of rows. Without a licence the downloaded "mark as
+paid" CSV (invoice number, payment date, amount) holds the first 20
+rows as a sample.
 
-**Pro** (9 EUR/mesiac alebo 79 EUR/rok) je pre účtovníka alebo firmu,
-ktorá to robí opakovane každý mesiac, a pridáva:
+**Pro** is convenience for an accountant or company that does this
+every month, not unlocked matching. It adds:
 
-- viac výpisov a účtov naraz v jednej relácii,
-- uložené mapovanie stĺpcov (netreba prepisovať pri každom importe),
-- nastaviteľné tolerancie (počet dní pri návrhu bez VS, centy pri
-  zhode sumy) uložené ako predvoľba,
-- export vo formáte pripravenom na import do Pohody, Omegy alebo
-  Money S3,
-- históriu predchádzajúcich párovaní.
+- the whole downloaded file,
+- several statements and accounts at once in one session,
+- saved column mapping (no remapping on every import),
+- adjustable tolerances (amount in euro, days around the due date for
+  a suggestion) saved as a preset,
+- an export in a column format meant for import into Pohoda, Omega or
+  Money S3 (an estimate of their import formats, not verified with
+  the vendors, so check it before importing),
+- a history of previous matching runs, stored in your browser.
 
-Kúpa je cez Stripe: 9 € mesačne alebo 79 € ročne, ako súčasť balíka
-[Bankové nástroje pre účtovníkov](https://arling.sk/bankove-nastroje/).
-Jedna licencia odomkne Pro aj v Generátore a v camt.053 do Excelu.
+Pricing: Pro is the Banking tools licence sold at
+https://arling.sk/bankove-nastroje/ for €9 a month or €79 a year, VAT
+included. One licence activates Pro here and in SEPA pain.001
+Generator and camt.053 to Excel. SEPA pain.001 Doctor is free and
+needs no licence.
 
-Licenčný mechanizmus je identický so sesterským SEPA pain.001
-Generátorom: podpísaná licencia (Ed25519, plán `sepa-pro`, spoločný pre celý balík Bankové nástroje)
-overená celá na strane klienta cez WebCrypto, uložená v
-`localStorage`; po platbe ju stránka získa cez
-`https://homelab.tailbf8f27.ts.net/licence/api/claim?session_id=`.
-Žiadny účet, žiadne prihlasovanie.
+Who sells and who sends the receipt: the licence is sold through
+Stripe Managed Payments. The merchant of record is Link (Sold through
+Link, LLC, which provides that service for Stripe): Link sends the
+receipt and the invoice as a PDF, and Stripe calculates and remits the
+VAT; ARLing s. r. o. delivers the tool and the licence key. Cancel or
+change the subscription at any time in the Stripe customer portal
+(https://billing.stripe.com/p/login/3cIaER9M63hNeFcg8B4ko00); it stays
+active until the end of the paid period. For a monthly or yearly
+subscription, ARLing refunds the payment on request within 14 days of
+purchase, without you giving a reason: write to support@arling.sk.
+Full terms: https://arling.sk/podmienky/en/ (sections 4 to 6).
 
-## Súkromie
+The licence mechanism is the same as in the sibling SEPA pain.001
+Generator: a signed licence (Ed25519, plan `sepa-pro`, shared by the
+whole Banking tools bundle) verified entirely client-side with
+WebCrypto and stored in `localStorage`; after payment the page claims
+it from ARLing's licence service with the Stripe checkout session id.
+No account, no login.
 
-- Žiadny účet, žiadne prihlasovanie, žiadne cookies pre samotný
-  nástroj.
-- Žiadne spracovanie výpisu ani faktúr na serveri; "backend" je váš
-  vlastný prehliadač.
-- Analytika (Umami) zaznamenáva, že párovanie prebehlo, nie čo bolo
-  v jeho vstupe.
+## Privacy
 
-## Spustenie lokálne
+- No account, no login, no cookies for the tool itself.
+- No server-side processing of the statement or the invoices; the
+  "backend" is your own browser.
+- Analytics (Umami) records that a matching run happened, not what was
+  in its input.
 
-Bez build kroku, statické súbory.
+## Running it locally
+
+No build step, static files.
 
 ```bash
 git clone https://github.com/AndryRoby/parovac-platieb.git
 cd parovac-platieb
 npx serve .
-# alebo len otvorte index.html priamo v prehliadači
+# or just open index.html directly in a browser
 ```
 
-## Nahlásenie chybného alebo nerozpoznaného formátu
+The live page at arling.sk/parovac-platieb/, with its English and
+German versions, is published from the arling.sk site repository; this
+repository holds the tool's engine and its Slovak page.
 
-Nájdete stĺpcovú hlavičku, ktorú nástroj nerozpozná, alebo prípad
-párovania, ktorý vyhodnotí zle? Založte issue na GitHub repe s:
+## Reporting a wrong or unrecognised format
 
-1. hlavičkami stĺpcov, ktoré ste použili (alebo anonymizovaný
-   vzorový riadok),
-2. z ktorého programu export pochádza,
-3. čo nástroj vyhodnotil a čo by malo byť správne.
+Found a column header the tool does not recognise, or a matching case
+it gets wrong? Open an issue on the GitHub repo with:
 
-Pred zverejnením anonymizujte citlivé údaje (reálne IBAN, mená,
-sumy); issues sú verejné.
+1. the column headers you used (or an anonymised sample row),
+2. which program the export comes from,
+3. what the tool decided and what would be correct.
 
-## Vylúčenie zodpovednosti
+Anonymise sensitive data (real IBANs, names, amounts) before posting;
+issues are public.
 
-Nástroj je poskytovaný "tak ako je", bez záruky. Párovanie sa riadi
-pravidlami opísanými vyššie (VS + suma, tolerancia centov, návrh bez
-VS do 45 dní od splatnosti); pri nezvyčajných prípadoch (napríklad
-preplatok rozdelený medzi viac faktúr) môže návrh vyžadovať ručnú
-kontrolu. Výsledok párovania je pomôcka na kontrolu úhrad, nie
-účtovný doklad ani náhrada za párovanie priamo vo vašom účtovnom
-systéme.
+## Disclaimer
 
-## O nástroji
+The tool is provided as is, without warranty. Matching follows the
+rules described above (VS plus amount, amount tolerance, suggestion
+without VS within 45 days of the due date); unusual cases (for example
+an overpayment split across several invoices) may need a manual check.
+The result is an aid for checking payments, not an accounting document
+or a replacement for matching in your accounting system.
 
-Vytvorila ARLing s. r. o. (Bratislava, Slovensko).
-Kontakt: andrej@arling.sk
+## About
 
-Súvisiace nástroje:
-- camt.053 výpis banky do Excelu: https://arling.sk/camt053-to-excel/
-- SEPA pain.001 Generátor (hromadný príkaz na úhradu z Excelu):
+Made by ARLing s. r. o. (Bratislava, Slovakia).
+Contact: support@arling.sk
+
+Related tools:
+- camt.053 to Excel: https://arling.sk/camt053-to-excel/
+- SEPA pain.001 Generator (batch payment file from Excel):
   https://arling.sk/sepa-pain001-generator/
-- SEPA pain.001 Doctor (kontrola hotového pain.001 súboru):
+- SEPA pain.001 Doctor (check a finished pain.001 file):
   https://arling.sk/sepa-pain001-doctor/
-- Ďalšie nástroje ARLing: https://arling.sk/
+- More ARLing tools: https://arling.sk/
+
+## Slovensky (skrátene)
+
+Párovač platieb spáruje výpis z banky (camt.053) so zoznamom vydaných
+faktúr podľa variabilného symbolu a sumy, celé v prehliadači. Párovanie
+a celé tabuľky na obrazovke sú zadarmo bez limitu riadkov; bez licencie
+má stiahnutý súbor prvých 20 riadkov ako ukážku. Pro za 9 € mesačne
+alebo 79 € ročne (DPH v cene) je jedna licencia pre tri nástroje:
+https://arling.sk/bankove-nastroje/. Kontakt: support@arling.sk.
