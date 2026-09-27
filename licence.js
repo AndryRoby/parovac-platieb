@@ -30,12 +30,12 @@
 // same functions for console/debug use.
 
 // Ed25519 public key of the ARLing licence service, base64url raw 32
-// bytes (GET https://server.invalid/licence/api/pubkey serves
+// bytes (GET https://api.arling.workers.dev/licence/api/pubkey serves
 // the same value). Baked in here rather than fetched: verification must
 // keep working even if the licence service is briefly unreachable.
 const PUBKEY_B64URL = 'xcMFelDwaZ1DC7ObQTKi8zXPvMlrTAlgZySNpfuYbC8';
 
-export const CLAIM_URL = 'https://server.invalid/licence/api/claim';
+export const CLAIM_URL = 'https://api.arling.workers.dev/licence/api/claim';
 export const DEFAULT_PLAN = 'sepa-pro';
 export const STORAGE_KEY = 'arling_licence_sepa-pro';
 
