@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="sk">
 <head>
-<script src="/style/vzhlad.js?v=97575009"></script>
+<script>(function(){var r=document.documentElement;window.arlingNacitavac=true;function go(){var l=[].slice.call(document.querySelectorAll('link[data-async]')),sk=[].slice.call(document.querySelectorAll('script[data-odlozene]'));function h(){r.classList.add('css');try{document.dispatchEvent(new Event('arling:css'))}catch(e){}}function skripty(){sk.forEach(function(x){var s=document.createElement('script');for(var i=0;i!==x.attributes.length;i++){var a=x.attributes[i];if(a.name!=='type'&&a.name!=='data-odlozene')s.setAttribute(a.name,a.value)}if(x.getAttribute('data-odlozene')==='module')s.type='module';s.async=false;x.parentNode.insertBefore(s,x.nextSibling)});sk=[]}var n=l.length,s=false;function z(){l.forEach(function(x){x.media='all'});h()}function p(){if(s)return;s=true;if(!n)h();else l.forEach(function(x){var b=false;function j(){if(b)return;b=true;if(--n===0)z()}x.addEventListener('load',j);x.addEventListener('error',j);var a=x.getAttribute('data-href');if(a)x.href=a;else if(x.sheet)j()});skripty()}var pr='';try{pr=performance.getEntriesByType('navigation')[0].type}catch(e){}var t=window.PerformanceObserver&&PerformanceObserver.supportedEntryTypes;if(location.hash.length>1||pr==='reload'||pr==='back_forward'||document.visibilityState==='hidden'||!t||t.indexOf('paint')===-1){p();return}try{new PerformanceObserver(function(e,o){if(!e.getEntriesByName('first-contentful-paint').length)return;o.disconnect();p()}).observe({type:'paint',buffered:true})}catch(e){p();return}document.addEventListener('visibilitychange',p);setTimeout(p,3000)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go()})();</script>
+<script type="text/plain" data-odlozene src="/style/vzhlad.js?v=c9b559ae"></script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="color-scheme" content="dark">
@@ -16,9 +17,9 @@
 <link rel="preload" href="/fonts/arling-sans.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/arling-serif.woff2" as="font" type="font/woff2" crossorigin>
 <!-- Jediný zdroj vzhľadu: ops/design/paper/paper.css, sem rozkopírovaný cez ops/design/sync-paper.mjs. -->
-<link rel="stylesheet" href="/style/paper.css?v=7e7d1c99">
+<link rel="stylesheet" href="/style/paper.css?v=e5838bcb">
 <link rel="stylesheet" href="/style/nastroj.css?v=c9081cae">
-<script src="/style/prepinac.js?v=668e98c9" defer></script>
+<script type="text/plain" data-odlozene src="/style/prepinac.js?v=71e7f906"></script>
 <style>
   /* Len to, čo je vlastné tejto stránke. Zvyšok je v /style/paper.css. */
   :root { color-scheme: light; }
@@ -63,7 +64,7 @@
     <nav id="hlavne-menu" class="site-main-nav" aria-label="Hlavná navigácia" data-site-aria="nav"><a href="https://arling.sk/#nastroje" data-site-nav="0">Nástroje</a><a href="https://arling.sk/#piloty" data-site-nav="1">Piloty</a><a href="https://arling.sk/notes/" data-site-nav="2">Návody</a><a href="https://arling.sk/how-we-work/" data-site-nav="3">O firme</a></nav>
     <a class="site-cta" href="https://arling.sk/efaktura/" data-site-cta data-site-label="cta" data-umami-event="shell_cta">Skontrolovať e-faktúru zadarmo</a>
   </div>
-  <script src="/style/menu-sk.js" defer></script>
+  <script type="text/plain" data-odlozene src="/style/menu-sk.js"></script>
 </header>
 
 <main id="arling-obsah" tabindex="-1">
@@ -110,7 +111,7 @@
     <p class="site-all"><a href="https://arling.sk/vsetko/" data-umami-event="shell_footer_all">Všetko na jednej stránke<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></a></p>
     <p class="site-dev" data-site-vyvojari><span>Pre vývojárov</span><em>Bezplatné diagnostiky chýb v CORS, JWT, OAuth, Supabase a Stripe webhookoch.</em><a href="https://arling.sk/vsetko/#vyvojari">Všetky nástroje pre vývojárov<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></a></p>
     <div class="site-foot-bottom"><p>ARLing s. r. o., Ivanská cesta 32E, 821 04 Bratislava, Slovensko. IČO 56583486, IČ DPH SK2122352100. <a href="mailto:podpora@arling.sk">podpora@arling.sk</a></p><p><a href="https://arling.sk/impressum/">Impressum</a> · <a href="https://arling.sk/llms.txt">llms.txt</a> · <a href="https://arling.sk/sitemap-index.xml">Sitemap</a></p></div>
-    <p class="site-foot-legal">Nástroje sú poskytované tak, ako sú, bez záruky. Anonymné počty návštev cez vlastné Umami. <a href="https://arling.sk/privacy/">Ochrana údajov</a> · <a href="https://arling.sk/podmienky/">Podmienky</a> · <a href="https://arling.sk/gdpr/">GDPR</a> · <a href="https://arling.sk/odstupenie/">Odstúpiť od zmluvy tu</a></p>
+    <p class="site-foot-legal">Nástroje sú poskytované tak, ako sú, bez záruky. Počty návštev cez vlastné Umami, pseudonymne a bez cookies. <a href="https://arling.sk/privacy/">Ochrana údajov</a> · <a href="https://arling.sk/podmienky/">Podmienky</a> · <a href="https://arling.sk/gdpr/">GDPR</a> · <a href="https://arling.sk/odstupenie/">Odstúpiť od zmluvy tu</a></p>
   </div>
 </footer>
 
@@ -149,6 +150,6 @@
   }
 })();
 </script>
-<script src="/style/paper-pohyb.js?v=390cc609" defer></script>
+<script type="text/plain" data-odlozene src="/style/paper-pohyb.js?v=2b5c7533"></script>
 </body>
 </html>
